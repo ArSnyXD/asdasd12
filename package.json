@@ -1,0 +1,13 @@
+{
+  "name": "tokyo-udune-tanav",
+  "version": "0.5.1",
+  "private": true,
+  "description": "Eestikeelne udune Tokyo tänav kolmanda isiku vaates",
+  "type": "module",
+  "scripts": {
+    "start": "node tooriistad/server.mjs",
+    "dev": "node tooriistad/server.mjs",
+    "test": "node tooriistad/kontroll.mjs"
+  },
+  "engines": { "node": ">=20.6" }
+}

@@ -1,0 +1,7 @@
+Jätka selles repositooriumis olevat mängu. Loe AGENTS.md, README.md, SEIS.md, ULESANDED.md ja viited/README.md ning vaata vajalikud pildid läbi.
+
+Keel ja failistruktuur on juba korrastatud. Kasuta praegust stseeni alusena; ära loo projekti uuesti ega taasesita vanu parandusi. Täida ULESANDED.md kõik kuus parandusrühma: H1 pindade vilkumine, vasak madal süvis, rõdude alapinnad, pargi proportsioonid, H2 astmeline fassaad ning aia kivisokkel.
+
+Säilita tegelane, juhtimine, udu, hämar retroilme, käigutee ja varasemad toimivad parandused. Kõik uus tekst, kommentaarid ja vastused peavad olema eesti keeles. Väliste teekide API ja litsentsid jäävad algsel kujul.
+
+Käivita mäng repositooriumi juurest käsuga npm start, kontroll käsuga npm test. Kohalikud sõltuvused ja tekstuurid on kaasas. Kontrolli lõplikus mängus pilti, liikumist, kokkupõrkeid ning tegelase ja automaatide varasemate paranduste säilimist. Uuenda SEIS.md tegelike tulemuste ja piirangutega. Esita lühike eestikeelne aruanne ning muudatused selle repositooriumi tavapärases töövoos.

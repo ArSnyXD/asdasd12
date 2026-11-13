@@ -1,0 +1,12 @@
+# Kohalikud sõltuvused ja vahetulemused.
+node_modules/
+__pycache__/
+*.py[cod]
+*.log
+*.zip
+.DS_Store
+Thumbs.db
+.env
+.env.*
+!.env.example
+kontrollivaljund/

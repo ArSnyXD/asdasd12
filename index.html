@@ -1,23 +1,62 @@
 <!doctype html>
 <html lang="et">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Shibuya tänavalõik – 3D</title>
-  <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="./src/style.css">
-  <script type="importmap">
-    { "imports": { "three": "./vendor/three.module.min.js" } }
-  </script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tokyo udune tänav — jalutuskäik</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="stiil/kujundus.css">
+<script type="importmap">
+{ "imports": { "three": "./teegid/three/build/three.module.js", "three/addons/": "./teegid/three/examples/jsm/" } }
+</script>
 </head>
-<body>
-  <div id="hud">
-    <strong>Shibuya · tänavalõik</strong>
-    <span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / nooled – kõndimine</span>
-    <span><kbd>Shift</kbd> – jooks</span>
-    <span>hiirega lohista – kaamera · rull – suum</span>
+<body data-mode="menu">
+<div id="app"></div>
+<svg id="overlay" xmlns="http://www.w3.org/2000/svg"></svg>
+
+<div id="hud">
+  <div class="keys">W A S D — liigu · hiir — vaata ringi · ratas — kaamera kaugus · Shift — jookse · Esc — paus ja menüü</div>
+  <div id="fps"></div>
+</div>
+
+<div id="menu">
+  <div class="card">
+    <div class="title" id="mtitle">Tokyo udune tänav</div>
+    <div class="sub" id="msub">Udune tänav hämarikus · jalutuskäik kolmanda isiku vaates</div>
+    <button id="start" class="primary">Alusta jalutuskäiku</button>
+    <button id="toStart" style="display:none">Tagasi algusesse</button>
+    <div class="settings">
+      <label class="row">Kvaliteet
+        <select id="quality">
+          <option value="low">Madal</option>
+          <option value="medium">Keskmine</option>
+          <option value="high">Kõrge</option>
+        </select>
+      </label>
+      <label><input type="checkbox" id="retro" checked> Retrofilter (väiksem lahutusvõime, hajutus ja teralisus)</label>
+      <label><input type="checkbox" id="fog" checked> Udu</label>
+    </div>
+    <div class="help">
+      <div><b>W A S D</b> / nooleklahvid — liigu kaamera suhtes</div>
+      <div><b>Hiir</b> — vaata ringi (hiir hõivatakse; muidu hoia vasakut nuppu all ja lohista)</div>
+      <div><b>Kerimisratas</b> — kaamera kaugus · <b>Q / E</b> — pööra kaamerat · <b>Shift</b> — jookse</div>
+      <div><b>Esc</b> — paus: hiir vabastatakse ja avaneb menüü</div>
+    </div>
   </div>
-  <div id="loading">Laadin stseeni…</div>
-  <script type="module" src="./src/main.js"></script>
+</div>
+
+<div id="panel">
+  <button id="ptoggle">Püsivaated ja pealtvaade</button>
+  <div id="pbody">
+    <div id="views"></div>
+    <button id="tagakulg">Tagasi jalutama</button>
+    <div id="info"></div>
+  </div>
+</div>
+
+<div id="loading"><div class="lbox"><div class="ltext">Stseeni laadimine…</div><div class="track"><i id="bar"></i></div></div></div>
+<div id="error"></div>
+<noscript><div id="nojs">See stseen vajab JavaScripti ja WebGL2 tuge.</div></noscript>
+<script type="module" src="kood/pohi.js"></script>
 </body>
 </html>
