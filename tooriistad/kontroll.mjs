@@ -52,7 +52,7 @@ for (const kiirus of [0, 1.55, 3.3]) {
 
 // Arhitektuuriparanduste proovipunktid: kattuvad pinnad, H1 süvis, pargi proportsioonid, H2 astmed ja aia sokkel.
 const { nelinurgad, kattuvused, ala } = await import('./kattuvus.mjs');
-const { H1, H2, PARK } = await import('../kood/seaded.js');
+const { H1, H2, PARK, PLAAN } = await import('../kood/seaded.js');
 const nelinurgad_ = nelinurgad(ruhmad);
 const kattuvaidPindu = Object.fromEntries(['H1', 'H2', 'koik'].map((a) => [a, kattuvused(nelinurgad_, ala(a)).length]));
 assert.deepEqual(kattuvaidPindu, { H1: 0, H2: 0, koik: 0 }, 'Leiti kattuvaid samatasapinnalisi pindu (vilkumine).');
@@ -62,10 +62,25 @@ assert.ok(col.overlaps(-21.5, H1.Y0 + 1.2, 0.27).length > 0, 'H1 süvise tagasei
 assert.equal(col.overlaps(-11.0, PARK.Y0 + 1.6, 0.27).length, 0, 'Pargi tänavapoolne sissepääs peab olema vaba.');
 assert.ok(col.overlaps(H1.PASS.X0 - 0.15, H1.Y0 + 0.5, 0.27).length > 0, 'H1 süvise ja läbipääsu vaheline post peab olema läbimatu.');
 assert.equal(col.overlaps((H1.PASS.X0 + H1.PASS.X1) / 2, H1.Y0 + 6, 0.27).length, 0, 'H1 läbipääs peab olema avatud.');
-const pargiLaius = PARK.X1 - PARK.X0, pargiPikkus = PARK.Y1 - PARK.Y0;
-assert.ok(pargiLaius <= 10 && pargiPikkus / pargiLaius >= 1.8, 'Park peab olema piklik (pikkus vähemalt 1,8 × laius).');
-for (const [x, y] of PARK.trees) assert.ok(x > PARK.X0 + 1 && x < PARK.X1 - 1 && y > PARK.Y0 + 1 && y < PARK.Y1 - 1, 'Pargipuu on väljaspool parki.');
+const pargiLaius = (Y) => kontekst.pargiIdaX(Y) - PARK.X0;
+const pargiPikkus = PARK.Y1 - PARK.Y0, lounaLaius = pargiLaius(PARK.Y0 + 2.5), pohjaLaius = pargiLaius(PARK.Y1 - 0.5);
+assert.ok(lounaLaius < 9 && pohjaLaius > lounaLaius + 5, 'Park peab olema kiil: kitsas tänava poolt, lai põhjas.');
+assert.ok(pargiPikkus / ((lounaLaius + pohjaLaius) / 2) >= 1.5, 'Park peab jääma piklikuks.');
+for (const [x, y] of PARK.trees) assert.ok(x > PARK.X0 + 1 && x < kontekst.pargiIdaX(y) - 1.5 && y > PARK.Y0 + 1 && y < PARK.Y1 - 1, 'Pargipuu on väljaspool parki.');
 assert.equal(PARK.trees.length, 6, 'Pargis peab olema kuus puud.');
+// E2 kulgeb pargi ääres: pargi idaserva ja E2 läänepoolse sõidutee serva vahel on ainult tellisriba,
+// mitte asfaldiväli; E2 suund pargi kohal on satelliidivaate järgi 20–30° põhjast itta.
+const { on: teljel, project: projitseeri } = await import('../kood/geomeetria.js');
+const e2 = kontekst.e2c, hwF = PLAAN.e2Tee.width / 2;
+for (let y = 7; y <= 22; y += 1) {
+  const sY = projitseeri(e2, [kontekst.pargiIdaX(y), y]).s, serv = teljel(e2, sY, hwF);
+  const vahe = Math.hypot(serv[0] - kontekst.pargiIdaX(y), serv[1] - y);
+  assert.ok(vahe < PLAAN.pargiaareRiba + 0.45, `Pargi ja E2 vahel on liiga lai riba (Y = ${y}: ${vahe.toFixed(2)} m).`);
+  const keskel = teljel(e2, sY, hwF + PLAAN.pargiaareRiba / 2);
+  assert.ok(Math.abs(kontekst.korgused.at(keskel[0], keskel[1]) - 0.03) < 0.005, 'Pargi ja E2 vahel peab olema tellisriba.');
+}
+const e2Nurk = Math.atan2(teljel(e2, 18)[0] - teljel(e2, 6)[0], teljel(e2, 18)[1] - teljel(e2, 6)[1]) * 180 / Math.PI;
+assert.ok(e2Nurk > 20 && e2Nurk < 30, `E2 suund pargi kohal on ootamatu (${e2Nurk.toFixed(1)}°).`);
 const sugavused = kontekst.h2.bays.map((b) => b.y);
 assert.ok(Math.max(...sugavused) - Math.min(...sugavused) >= 1.0 && new Set(sugavused).size >= 2, 'H2 fassaad peab astuma sügavusse vähemalt 1 m.');
 assert.ok(kontekst.h2.bays.filter((b) => b.rodud).length >= 2, 'H2 peab säilitama rõdudega fassaadiosad.');
@@ -77,7 +92,8 @@ assert.ok(aiaKorgus >= 1.9, 'Aia kokkupõrkekeha peab ulatuma kivisokli ja balus
 const tulemus = {
   stseen: loenda(stseen), tegelane: loenda(tegelane.root),
   takistusi: kontekst.col.items.length, konnimiseNihe: +nihe.toFixed(3),
-  kattuvaidPindu, pargiMootmed: { laius: +pargiLaius.toFixed(1), pikkus: +pargiPikkus.toFixed(1) },
+  kattuvaidPindu, pargiMootmed: { lounaots: +lounaLaius.toFixed(1), pohjaots: +pohjaLaius.toFixed(1), pikkus: +pargiPikkus.toFixed(1) },
+  e2Suund: +e2Nurk.toFixed(1),
   h2Sugavused: sugavused, aiaKorgus: +aiaKorgus.toFixed(2),
   tulemus: 'Läbitud',
   piirang: 'See kontroll ei tõenda visuaalset vastavust ega graafikaprotsessori jõudlust.',
