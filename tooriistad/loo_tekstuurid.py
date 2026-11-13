@@ -1,24 +1,22 @@
 #!/usr/bin/env python3
 """Stseeni protseduurtekstuuride generaator (NumPy ja Pillow).
 
-Käivita: python3 tooriistad/loo_tekstuurid.py
+Käivita: python3 tooriistad/loo_tekstuurid.py [funktsioon ...]
+Argumentidega luuakse ainult nimetatud funktsioonide tekstuurid, nt looPeatumiskiri looLiiklusmargid;
+igal funktsioonil on oma juhuarvude seeme, seega osaline käivitamine annab sama tulemuse.
 Väljund: varad/tekstuurid/. Pilte ei laadita võrgust ega kopeerita fotodelt.
-Peatumiskiri joonistatakse kohaliku ladina kirjamärgistikku toetava fondiga."""
+Teekiri ja peatumismärk on jaapani keeles (止まれ); kohalik font valitakse moodulis kirjad.py."""
 import math
 import os
 
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
+
+from kirjad import jaapaniFont, keskel, kontrolliMargid
 
 ASUKOHT = os.path.dirname(os.path.abspath(__file__))
 VALJUND = os.path.join(ASUKOHT, '..', 'varad', 'tekstuurid')
 os.makedirs(VALJUND, exist_ok=True)
-FONDI_KANDIDAADID = [
-    '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf',
-    '/usr/share/fonts/truetype/liberation2/LiberationSans-Bold.ttf',
-    '/System/Library/Fonts/Supplemental/Arial Bold.ttf',
-    'C:/Windows/Fonts/arialbd.ttf',
-]
 
 
 def juhu(seed):
@@ -94,16 +92,6 @@ def taidaLabipaistvad(rgb, a):
     return np.where(m[..., None] > 0, rgb, fill)
 
 
-def leiaFont(size):
-    for p in FONDI_KANDIDAADID:
-        if os.path.exists(p):
-            try:
-                return ImageFont.truetype(p, size)
-            except Exception:
-                pass
-    return None
-
-
 def joonistaServadega(S, fn):
     """Joonistamine üle pildiservade õmblusteta tekstuuri jaoks."""
     for ox in (-S, 0, S):
@@ -166,13 +154,15 @@ def looVarvijoon():
 
 
 def looPeatumiskiri():
+    """Teekiri 止まれ. Ruudukujuline tekstuur venitab märgid sõidusuunas umbes kolm korda pikemaks
+    (660 × 240 → 512 × 512 ning tasand 2,4 × 2,6 m), nagu Jaapani teekirjadel."""
     W = H = 512
-    font = leiaFont(155)
+    tekst = '止まれ'
+    kontrolliMargid(tekst)
+    font = jaapaniFont(190)
     img = Image.new('L', (660, 240), 0); d = ImageDraw.Draw(img)
-    if font:
-        d.text((330, 122), 'PEATU', font=font, fill=255, anchor='mm')
-    else:
-        d.rectangle([20, 60, 640, 180], fill=255)
+    for i, ch in enumerate(tekst):
+        keskel(d, 330 + (i - 1) * 215, 120, ch, font, 255)
     img = img.resize((W, H), Image.BILINEAR)
     a = np.asarray(img, np.float32) / 255
     r = juhu(4); n = fbm(H, W, 6, 6, r, 5)
@@ -647,14 +637,13 @@ def looKaevuluuk():
 
 def looLiiklusmargid():
     S = 256
-    font = leiaFont(45)
     img = Image.new('RGBA', (S, S), (0, 0, 0, 0)); d = ImageDraw.Draw(img)
     tri = [(10, 26), (246, 26), (128, 236)]
     d.polygon(tri, fill=(236, 236, 232, 255))
     inner = [(34, 40), (222, 40), (128, 206)]
     d.polygon(inner, fill=(178, 28, 34, 255))
-    if font:
-        d.text((128, 92), 'PEATU', font=font, fill=(240, 240, 236, 255), anchor='mm')
+    # Jaapani peatumismärk: valge 止まれ kolmnurga laiemas ülaosas; suurus 40 mahub kitsenevasse alasse.
+    keskel(d, 128, 70, '止まれ', jaapaniFont(40), (240, 240, 236, 255))
     a = np.asarray(img, np.float32) / 255
     save(np.concatenate([taidaLabipaistvad(a[..., 0:3], a[..., 3]), a[..., 3:4]], -1), 'peatumismark.png')
 
@@ -681,4 +670,9 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    import sys
+    if sys.argv[1:]:
+        for nimi in sys.argv[1:]:
+            globals()[nimi]()
+    else:
+        main()
