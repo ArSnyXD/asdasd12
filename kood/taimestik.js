@@ -171,19 +171,20 @@ export function looTaimestik(B, ctx) {
     B.add('puukoor', ahenevToru(new THREE.LineCurve3(new THREE.Vector3(X, 0.6, -Y), new THREE.Vector3(X + (R() - 0.5) * 0.8, h - r * sy * 0.4, -Y)), 1, 6, tr, tr * 0.6));
   }
 
-  // Hekid H1 musta aia taga ning pargi H1-poolsel ja põhjapoolsel piiril.
+  // Hekid H1 musta aia taga ning pargi H1-poolsel ja põhjapoolsel piiril; põhjahekk lõpeb E2 äärekivi ees.
   // H2 tänavahekid luuakse esiväljaku osana ning pööratakse koos hoonega.
+  const hekiIda = ctx.pargiIdaX(PARK.Y1 - 0.45) - 0.35;
   hekirida(B, -31.0, -23.7, 5.75, 6.45, 0.95, 11);
   hekirida(B, -15.25, -14.5, PARK.Y0 + 0.9, PARK.Y1 - 0.4, 1.0, 16);
-  hekirida(B, -14.5, PARK.X1 - 0.3, PARK.Y1 - 0.8, PARK.Y1 - 0.1, 1.15, 17);
-  for (const [x, y, r] of [[-13.9, PARK.Y1 - 1.4, 0.7], [-12.6, PARK.Y1 - 1.2, 0.6], [PARK.X1 - 1.0, PARK.Y1 - 1.3, 0.65], [-14.2, 6.0, 0.55], [-14.3, 12.0, 0.5]]) {
+  hekirida(B, -14.5, hekiIda, PARK.Y1 - 0.8, PARK.Y1 - 0.1, 1.15, 17);
+  for (const [x, y, r] of [[-13.9, PARK.Y1 - 1.4, 0.7], [-12.6, PARK.Y1 - 1.2, 0.6], [hekiIda - 0.9, PARK.Y1 - 1.3, 0.65], [-14.2, 6.0, 0.55], [-14.3, 12.0, 0.5]]) {
     B.add('hekk', blob(x, 0.45, -y, r, { rng: R, sy: 0.7, rough: 0.5, detail: 1 }));
   }
 
   // Hekkide kokkupõrkekehad lähtuvad nende piiridest.
   ctx.col.box(-31.0, -23.7, 5.75, 6.45, 0.95, 'hekk');
   ctx.col.box(-15.25, -14.5, PARK.Y0 + 0.9, PARK.Y1 - 0.4, 1.0, 'hekk');
-  ctx.col.box(-14.5, PARK.X1 - 0.3, PARK.Y1 - 0.8, PARK.Y1 - 0.1, 1.15, 'hekk');
+  ctx.col.box(-14.5, hekiIda, PARK.Y1 - 0.8, PARK.Y1 - 0.1, 1.15, 'hekk');
   for (const [k, cb] of Object.entries(cards)) { const g = cb.geometry(); if (g) B.add(k, g); }
   return info;
 }
