@@ -213,6 +213,8 @@ export function looH2(B, ctx) {
     F.add('h2Sein', plaanikast(b.x0, b.x1, Y0, b.y, GF, TOP, { faces: 'NS', gb }));
     for (const s of b.sides) F.add('h2Sein', plaanikast(b.x0, b.x1, Y0, b.rodud ? gy : b.y, GF, TOP, { faces: s, gb }));
     F.add('soffit', plaanikast(b.x0, b.x1, gy, b.rodud ? by : b.y, GF - 0.25, GF - 0.25, { faces: 'B' }));
+    // Tagasiastuva osa arkaadilae serv: esipind lae ja ülemise mahu vahel, et sinna ei jääks pilu.
+    if (!b.rodud) F.add('h2Sein', plaanikast(b.x0, b.x1, gy, b.y, GF - 0.25, GF, { faces: 'N', gb }));
   }
 
   // Rõdud klaaspiirete ja mattide vaheseintega eenduvatel osadel; tagasiastuvatel osadel kitsad aknad.
@@ -238,12 +240,21 @@ export function looH2(B, ctx) {
       }
     }
   }
-  // Rõduribade otsaseinad täiskõrguses igal eenduval osal ning ribade pealmine plaat otsaseinte vahel.
+  // Rõduribade otsaseinad igal eenduval osal ning ribade pealmine plaat otsaseinte vahel.
+  // Hoone lääneotsa sein ulatub maapinnani ja sulgeb arkaadi; astmete vahel olevad otsaseinad algavad
+  // arkaadi laest, et need ei seisaks esimese korruse akende, fuajee ega garaaži ees.
   const CAP = TOP + 0.35;
+  const uim = (x0, x1) => {
+    const ots = x0 <= X0 + 1e-6 || x1 >= X1 - 1e-6, h0 = ots ? 0 : GF - 0.25;
+    F.add('h2Sein', plaanikast(x0, x1, gy, by + 0.05, h0, CAP, { faces: 'NEWT', gb }));
+    // Alapind ainult rõduplaadist ettepoole jäävas ribas; ülejäänu katab arkaadi lagi.
+    if (!ots) F.add('h2Sein', plaanikast(x0, x1, by, by + 0.05, h0, h0, { faces: 'B', gb }));
+    return ots;
+  };
+  const uimed = [];
   for (const b of BAYS) {
     if (!b.rodud) continue;
-    F.add('h2Sein', plaanikast(b.x0, b.x0 + 0.25, gy, by + 0.05, 0, CAP, { faces: 'NEWT', gb }));
-    F.add('h2Sein', plaanikast(b.x1 - 0.25, b.x1, gy, by + 0.05, 0, CAP, { faces: 'NEWT', gb }));
+    uimed.push([b.x0, b.x0 + 0.25, uim(b.x0, b.x0 + 0.25)], [b.x1 - 0.25, b.x1, uim(b.x1 - 0.25, b.x1)]);
     F.add('h2Plaat', plaanikast(b.x0 + 0.25, b.x1 - 0.25, gy, by + 0.05, TOP - 0.1, CAP, { faces: 'NSTB' }));
   }
 
@@ -259,8 +270,9 @@ export function looH2(B, ctx) {
   for (const [a, b] of GR) F.add('vore', fassaadinelinurk('N', gy + 0.3, (a + b) / 2, b - a, 0, 2.35, [0, 0, b - a, 2.35]));
   F.add('tumeMetall', plaanikast(17.85, 18.05, gy, gy + 0.32, 0, 2.7, { faces: 'NSEW' }));
   F.add('h2Plaat', plaanikast(14.3, 21.6, gy, gy + 0.35, 2.7, GF - 0.25, { faces: 'NB' }));
-  win(F, R, 'N', gy, 9.2, 1.4, 1.0, 2.1, { cell: 6, aknaplekiMaterjal: 'h2Plaat' });
-  win(F, R, 'N', gy, 11.6, 1.4, 1.0, 2.1, { cell: 7, aknaplekiMaterjal: 'h2Plaat' });
+  const AKNAD1 = [[9.2, 1.4], [11.6, 1.4]];   // Esimese korruse aknad: kohalik keskpunkt ja laius.
+  win(F, R, 'N', gy, AKNAD1[0][0], AKNAD1[0][1], 1.0, 2.1, { cell: 6, aknaplekiMaterjal: 'h2Plaat' });
+  win(F, R, 'N', gy, AKNAD1[1][0], AKNAD1[1][1], 1.0, 2.1, { cell: 7, aknaplekiMaterjal: 'h2Plaat' });
   F.add('hallMetall', fassaadikast('N', gy, 12.6, 13.4, 0.9, 1.8, 0, 0.14));
 
   // Idaots J/E1 poole: nurgarõdud tagasiastuva otsaosa fassaadijooneni, aknad ja kliimaseadmed.
@@ -314,11 +326,8 @@ export function looH2(B, ctx) {
   // Plaanil pööratud kokkupõrkekastid ja kaamera laepiirangud.
   const ob = (x0, x1, y0, y1, h, tag) => { const c = F.plaanile((x0 + x1) / 2, (y0 + y1) / 2); col.obox(c[0], c[1], (x1 - x0) / 2, (y1 - y0) / 2, ang, h, tag); };
   ob(X0, X1, Y0, gy, TOP, 'H2');
-  for (const b of BAYS) {
-    if (!b.rodud) continue;
-    ob(b.x0, b.x0 + 0.25, gy, by + 0.05, TOP, 'H2');
-    ob(b.x1 - 0.25, b.x1, gy, by + 0.05, TOP, 'H2');
-  }
+  // Arkaadis on läbimatu ainult maapinnani ulatuv otsasein; kõrgemal algavad otsaseinad jäävad pea kohale.
+  for (const [x0, x1, ots] of uimed) if (ots) ob(x0, x1, gy, by + 0.05, TOP, 'H2');
   ob(14.3, 21.6, gy, gy + 0.32, 2.4, 'vore');
   const ceil = (x0, x1, y0, y1, h) => {
     const n = Math.max(1, Math.ceil((x1 - x0) / 4));
@@ -330,7 +339,7 @@ export function looH2(B, ctx) {
   };
   ceil(X0, X1, gy, by + 0.05, GF - 0.25);
   ceil(LOB[0] - 0.3, LOB[1] + 0.3, gy, gy + 1.7, 2.95);
-  ctx.h2 = { F, L, D, ang, gy, by, TOP, drive: [14.5, 21.4], fuajee: LOB, bays: BAYS,
+  ctx.h2 = { F, L, D, ang, gy, by, GF, TOP, drive: [14.5, 21.4], fuajee: LOB, bays: BAYS, aknad1: AKNAD1, uimed,
     poly: [F.plaanile(0, -D), F.plaanile(L, -D), F.plaanile(L, gy), F.plaanile(0, gy)], origin: F.plaanile(0, 0), edgeY: null };   // Esimese korruse seinte piirjoon kontrollideks; rõdudealune arkaad on avatud.
   looH2Esiväljak(B, ctx, R);
 }
