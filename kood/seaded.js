@@ -1,12 +1,12 @@
 // Asendiplaan ja vaadete seaded. Plaanil X itta, Y põhja, ühik meeter.
 // Punkt (0, 0) on ristmik J. Mõõtmed on ligikaudsed, osade vastastikune asetus on säilitatud.
 // E1 jätkab S–J peatänavat sujuvalt kagusse, pöörates veidi paremale.
-// E2 on eraldi põhjapoolne haru piki aeda. Aed pöördub J juures
-// ja jätkub E1 kirdeküljel.
+// E2 on eraldi põhjapoolne haru: see hargneb peatänavast J-st läänes ja kulgeb satelliidivaate järgi
+// umbes 25° põhjast itta pargi ja kivipiirde vahel. Aed pöördub ristmikul ja jätkub E1 kirdeküljel.
 
 export const PLAAN = {
   S: [-33, 0.2],        // Algus: peatänava ligipääsetava osa lääneots.
-  J: [0, 0],            // Ristmik.
+  J: [0, 0],            // Ristmik; E1 algus peatänaval.
   E2lopp: [4.7, 25.0],   // Põhjapoolse haru ligipääsetava osa lõpp.
   E1lopp: [20.6, -10.0], // E1 ligipääsetava osa lõpp; tõkke taga kaob tänav udusse.
   // Peatänav edelast läbi S ja J edasi kagusse E1-na.
@@ -17,20 +17,23 @@ export const PLAAN = {
       [4.5, -0.75], [8.6, -2.2], [12.4, -4.4], [16.2, -6.9], [20.0, -9.6], [24.0, -12.4], [29.0, -15.9],
       [34.5, -19.8], [40.0, -24.5], [45.0, -30.0], [49.0, -37.0], [52.0, -46.0], [54.0, -57.0]],
   },
-  // Põhjapoolne haru E2 kulgeb J-st mööda aeda põhja.
+  // Põhjapoolne haru E2: telg algab peatänava teljelt pargi kagunurga kohalt ja kulgeb sirgelt
+  // pargi ääres (läänepoolne äärekivi on pargi piir), seejärel pöördub aeda järgides kirdesse.
   e2Tee: {
     width: 4.4,
-    pts: [[0, 0], [1.2, 8], [2.6, 16], [4.4, 24], [7.6, 32.4], [12.6, 40.6], [19.5, 49]],
+    pts: [[-6.6, 0.78], [-4.55, 5.1], [-1.65, 11.2], [1.25, 17.3], [4.4, 24], [7.6, 32.4], [12.6, 40.6], [19.5, 49]],
   },
   aiaNiheE2: 3.75,  // E2 telje ja aia telje vahe itta.
   aiaNiheE1: 4.0,   // E1 telje ja aia telje vahe kirdesse.
-  aiaNurgaraadius: 4.0,    // Aia välisnurga ümardusraadius J juures.
+  aiaNurgaraadius: 3.0,    // Aia välisnurga ümardusraadius ristmikul; E2 ja E1 vahel on terav nurk.
+  pargiNurgaraadius: 3.0,  // Pargi äärekivi ümardus peatänava ja E2 vahel.
   pohjakonnitee: 1.4,       // Kõnnitee.
   lounakonnitee: 1.0,       // Kitsas riba H2 ääres ja E1 edelaküljel.
   aiakonnitee: 1.3,       // Kõnnitee.
+  pargiaareRiba: 0.9,     // Tellisriba sõidutee serva ja pargi äärekivi vahel ning E2 läänekõnnitee laius.
   laanetoke: -40.0,      // Peatänava läänetõkke X-koordinaat alguspunkti taga.
   tokeE1: 26.0,      // Kaugus J-st tõkkeni piki E1 telge.
-  tokeE2: 26.0,      // Kaugus J-st tõkkeni piki E2 telge.
+  tokeE2: 26.0,      // Kaugus E2 algusest tõkkeni piki E2 telge.
 };
 
 // Peahoonete mõõtmed: põhiseinad ilma rõdudeta.
@@ -50,22 +53,23 @@ export function h2Plaan(x, y) {
   return [H2.east[0] + dx * c - y * s, H2.east[1] + dx * s + y * c];
 }
 
-// Kuus pargipuud kahes kolmeses reas piki H1 külgseina; pargi pikk telg kulgeb E2 suunas.
-// Satelliidi- ja tänavavaate järgi on park kitsas piklik riba (laius umbes 9–10 m, pikkus umbes 19 m):
-// lühike külg avaneb S–J tänavale, idaserv on sirge ja tänavapoolne nurk on viltu lõigatud.
-// E2 sõidutee jääb pargist idas kaugemale kui fotodel; vahele jääb asfaltlaiend, sest tee ja aia asetust ei muudeta.
+// Park on satelliidivaate järgi kiil H1 külgseina ja E2 vahel: tänavapoolne ots umbes 7 m,
+// põhjaots umbes 16 m lai ning idaserv on E2 läänepoolne äärekivi (äärekivi arvutatakse E2 teljest).
+// Kuus puud kahes reas: läänerida H1 ääres, idarida umbes 2,6 m äärekivist piki teed.
+// Raamid ja pingid on puuridade vahel, valgustid idaserva lähedal.
 export const PARK = {
-  X0: -15.3, X1: -5.7, Y0: 4.4, Y1: 23.4,         // Plaadiala lääneserv H1 seina juures, idaserv ning lõuna- ja põhjapiir.
-  nurgaLoige: [3.2, 5.5],                          // Kagunurga viltu lõige: pikkus piki tänavat ja piki idaserva.
-  trees: [[-13.3, 7.4], [-8.5, 7.4], [-13.3, 13.0], [-8.5, 13.0], [-13.3, 18.6], [-8.5, 18.6]],
-  frames: [[-10.9, 10.2], [-10.9, 15.8]],
-  blocks: [[-10.9, 10.2, 1.57], [-10.9, 15.8, 1.57], [-12.0, 6.0, 1.57], [-12.0, 21.2, 1.57]],   // Otsmised plokid jätavad tänavapoolse sissepääsu vabaks.
+  X0: -15.3, Y0: 4.4, Y1: 23.4,                   // Plaadiala lääneserv H1 seina juures ning lõuna- ja põhjapiir.
+  trees: [[-12.8, 8.5], [-9.3, 8.5], [-12.8, 14.0], [-6.7, 14.0], [-12.8, 19.5], [-4.1, 19.5]],
+  frames: [[-10.4, 11.2], [-9.1, 16.75]],
+  blocks: [[-10.4, 11.2, 1.57], [-9.1, 16.75, 1.57], [-13.6, 6.0, 1.57], [-9.0, 21.9, 0]],
+  lamps: [[-8.5, 6.6], [-1.3, 21.4]],
+  sissepaasud: { tanav: [-12.0, -10.0], e2: [[10.3, 12.3], [15.7, 17.7]] },   // Postirea vahed: X peatänava ääres, Y E2 ääres.
 };
 
 // Suured puud aia taga; templit ei ehitata. [X, Y, kõrgus, võra raadius]
-// E1 kohal olnud puud on viidud aia taha.
+// E1 kohal olnud puud on viidud aia taha; ristmiku lähim puu järgib aia uut asukohta.
 export const SUURED_PUUD = [
-  [8.8, 16.5, 20, 7.0], [7.8, 6.8, 21, 7.8], [13.8, 2.8, 19, 7.4], [22.0, -2.2, 18, 7.0],
+  [8.8, 16.5, 20, 7.0], [4.6, 7.4, 21, 7.8], [13.8, 2.8, 19, 7.4], [22.0, -2.2, 18, 7.0],
   [14.0, 26.0, 17, 6.6], [17.0, 10.0, 22, 8.2], [29.6, -6.6, 20, 7.6], [24.5, 5.2, 18, 7.2],
 ];
 
@@ -90,11 +94,12 @@ export const VAATED = {
   tagasivaade: { name: 'Tagasivaade', pos: [-0.6, 0.5, 2.4], look: [-34.0, 1.3, 3.9], fov: 52 },
   e1:      { name: 'E1-lt ristmikule', pos: [19.4, -8.7, 2.3], look: [-4.0, 3.4, 4.0], fov: 52 },
   pikiE1: { name: 'Piki E1', pos: [2.4, 0.3, 2.0], look: [26.0, -14.8, 2.8], fov: 52 },
-  e2:      { name: 'E2-lt ristmikule', pos: [3.6, 21.0, 2.3], look: [-1.5, -3.0, 4.2], fov: 52 },
+  e2:      { name: 'E2-lt ristmikule', pos: [3.2, 21.5, 2.3], look: [-6.0, 1.0, 1.6], fov: 52 },
   aed:   { name: 'Ristmik → aed', pos: [-7.0, 0.9, 2.3], look: [9.0, -0.5, 5.0], fov: 55 },
   h1:      { name: 'H1: fassaad', pos: [-18.2, -2.2, 1.6], look: [-20.4, 8.6, 7.4], fov: 64 },
   h1Sissepaas:  { name: 'H1: esiväljak ja läbipääs', pos: [-17.6, 3.0, 1.6], look: [-18.5, 16.0, 1.4], fov: 58 },
-  park:    { name: 'Park H1 kõrval', pos: [-12.6, 1.6, 1.8], look: [-9.4, 20.0, 3.0], fov: 60 },
+  park:    { name: 'Park H1 kõrval', pos: [-12.4, 1.4, 1.8], look: [-4.5, 20.0, 3.0], fov: 60 },
+  pargiNurk: { name: 'Park ja E2 ristmikult', pos: [-12.4, 2.6, 1.6], look: [2.0, 22.0, 2.4], fov: 64 },
   h2Kulg:  { name: 'H2 E1 poolt', pos: [9.6, -3.2, 1.7], look: [-7.0, -9.0, 6.0], fov: 56 },
   h2Esiväljak: { name: 'H2: esiväljak', pos: [...h2Plaan(15.5, 7.4), 1.6], look: [...h2Plaan(15.0, 0.0), 5.5], fov: 60 },
   automaadid: { name: 'Joogiautomaadid', pos: [-17.4, 0.3, 1.55], look: [-19.5, -4.0, 1.0], fov: 50 },
@@ -103,10 +108,10 @@ export const VAATED = {
 
 export const TAHISED = [
   { id: 'S', text: 'S — algus', at: [-33, 0.2] },
-  { id: 'J', text: 'J — ristmik', at: [0.6, -0.4] },
+  { id: 'J', text: 'J — ristmik', at: [-3.2, 0.5] },
   { id: 'H1', text: 'H1 — hoone 1 (6 korrust)', at: [-20.3, 20.0] },
   { id: 'H2', text: 'H2 — hoone 2 (7 korrust)', at: h2Plaan(10.0, -6.0) },
-  { id: 'P', text: 'P — väikepark, 6 puud', at: [-10.9, 13.0] },
+  { id: 'P', text: 'P — väikepark, 6 puud', at: [-8.6, 14.6] },
   { id: 'E1', text: 'E1 — tänava jätk kagusse', at: [20.6, -10.0] },
   { id: 'E2', text: 'E2 — põhjapoolne haru', at: [4.7, 25.0] },
   { id: 'V', text: 'joogiautomaadid', at: h2Plaan(2.1, 0.6), cls: 'dim' },
