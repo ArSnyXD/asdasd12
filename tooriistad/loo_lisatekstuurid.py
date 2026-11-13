@@ -1,21 +1,16 @@
 #!/usr/bin/env python3
 """Täiendavad protseduurtekstuurid. Vajab NumPyd ja Pillow’ teeki.
 Käivita: python3 tooriistad/loo_lisatekstuurid.py
-Fondifaili saab määrata keskkonnamuutujaga TOKYO_FONT."""
+Sildid, automaatide kirjad ja sulgemisplakat on jaapani keeles; kohalik font valitakse moodulis
+kirjad.py (muu faili saab määrata keskkonnamuutujaga TOKYO_FONT)."""
 import os
 import numpy as np
-from PIL import Image, ImageDraw, ImageFilter, ImageFont
+from PIL import Image, ImageDraw, ImageFilter
+
+from kirjad import jaapaniFont as font, keskel, kontrolliMargid
 
 VALJUND = os.path.join(os.path.dirname(__file__), '..', 'varad', 'tekstuurid')
-FONDI_TEE = os.environ.get('TOKYO_FONT', '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf')
 rs = np.random.default_rng(2026)
-
-
-def font(size):
-    try:
-        return ImageFont.truetype(FONDI_TEE, size)
-    except OSError:
-        return ImageFont.load_default()
 
 
 def mura(h, w, scale=1.0, blur=0):
@@ -62,13 +57,8 @@ def nimesilt():
     im = Image.fromarray(np.clip(a, 0, 255).astype(np.uint8))
     d = ImageDraw.Draw(im)
     d.rectangle([10, 10, w - 11, h - 11], outline=(150, 144, 132), width=3)
-    f1, f2 = font(78), font(40)
-    t1 = 'U D U M A J A'
-    b = d.textbbox((0, 0), t1, font=f1)
-    d.text(((w - (b[2] - b[0])) / 2, 46), t1, font=f1, fill=(222, 214, 198))
-    t2 = 'ELUMAJA'
-    b = d.textbbox((0, 0), t2, font=f2)
-    d.text(((w - (b[2] - b[0])) / 2, 162), t2, font=f2, fill=(190, 182, 168))
+    keskel(d, w / 2, 98, '霧の杜レジデンス', font(70), (222, 214, 198), vahe=8)
+    keskel(d, w / 2, 186, '住居専用エントランス', font(34), (190, 182, 168), vahe=6)
     save(im, 'nimesilt.png')
 
 
@@ -94,6 +84,7 @@ Korpuse värvid vastavad automaadi külgmaterjalidele. Juhuarvugeneraator on era
 
     def keskneTekst(D, cx, y, text, maxw, size, fill, stroke=0, sfill=None):
         """Keskjoondatud tekst: tähtede ülaserv y juures; suurus väheneb, kuni tekst mahub laiusesse."""
+        kontrolliMargid(text)
         while True:
             f = font(size)
             b = scratch.textbbox((0, 0), text, font=f, stroke_width=stroke)
@@ -112,14 +103,14 @@ Korpuse värvid vastavad automaadi külgmaterjalidele. Juhuarvugeneraator on era
     dc, de = ImageDraw.Draw(col), ImageDraw.Draw(ext)
     liigid = [
         dict(body=(216, 178, 56), paiseTaust=(192, 36, 30), paiseTekst=(255, 222, 64),
-             pais='SOODSAD JOOGID', alampealkiri='IGA PÄEV SOODNE', plakat='munt',
-             kleebis='HEA HIND IGA PÄEV!', kleebiseTaust=(204, 38, 34), kleebiseTekst=(255, 232, 80),
+             pais='激安ドリンク', alampealkiri='毎日がお買い得', plakat='munt',
+             kleebis='いつでもお手頃価格！', kleebiseTaust=(204, 38, 34), kleebiseTekst=(255, 232, 80),
              hinnad=[100, 100, 100, 80, 50],
              cols=[(206, 40, 36), (240, 150, 30), (60, 150, 70), (236, 236, 228), (40, 110, 190), (120, 190, 220),
                    (250, 210, 60), (150, 200, 90), (230, 90, 120), (90, 60, 140)]),
         dict(body=(224, 166, 44), paiseTaust=(28, 84, 156), paiseTekst=(255, 255, 255),
-             pais='KÜLMAD JOOGID 100 ¥', alampealkiri='KÜLMAD JA KUUMAD JOOGID', plakat='tass',
-             kleebis='MAITSEV JOOGIPAUS', kleebiseTaust=(34, 96, 170), kleebiseTekst=(255, 255, 255),
+             pais='冷たいお飲み物 100円', alampealkiri='つめた〜い・あったか〜い', plakat='tass',
+             kleebis='ほっとひと息', kleebiseTaust=(34, 96, 170), kleebiseTekst=(255, 255, 255),
              hinnad=[100, 120, 130, 130],
              cols=[(92, 56, 34), (30, 30, 34), (24, 50, 110), (200, 160, 60), (60, 120, 70), (180, 50, 40),
                    (230, 230, 220), (130, 90, 50), (40, 140, 160), (210, 120, 40)]),
@@ -206,15 +197,15 @@ Korpuse värvid vastavad automaadi külgmaterjalidele. Juhuarvugeneraator on era
             dc.rectangle([x0 + 36, 578, x0 + 300, 664], fill=(250, 246, 232))
             dc.ellipse([x0 + 46, 584, x0 + 120, 658], fill=(226, 188, 64), outline=(170, 130, 30), width=3)
             keskneTekst(dc, x0 + 83, 607, '100', 60, 28, (110, 76, 10))
-            keskneTekst(dc, x0 + 210, 590, 'ÜHE MÜNDIGA', 170, 32, (200, 34, 30))
-            keskneTekst(dc, x0 + 210, 632, 'KÕIK 100 ¥', 170, 22, (40, 40, 44))
+            keskneTekst(dc, x0 + 210, 590, 'ワンコイン', 170, 32, (200, 34, 30))
+            keskneTekst(dc, x0 + 210, 632, '全品100円', 170, 22, (40, 40, 44))
         else:
             dc.rectangle([x0 + 36, 578, x0 + 300, 664], fill=(214, 230, 242))
             dc.ellipse([x0 + 46, 640, x0 + 124, 656], fill=(110, 74, 46))
             dc.rounded_rectangle([x0 + 56, 592, x0 + 112, 646], radius=10, fill=(244, 240, 232), outline=(110, 74, 46), width=3)
             dc.ellipse([x0 + 64, 596, x0 + 104, 608], fill=(96, 58, 34))
-            keskneTekst(dc, x0 + 210, 590, 'KUUM', 170, 32, (200, 40, 34))
-            keskneTekst(dc, x0 + 210, 632, 'KOHV JA TEE', 170, 22, (70, 50, 36))
+            keskneTekst(dc, x0 + 210, 590, 'あったか〜い', 170, 32, (200, 40, 34))
+            keskneTekst(dc, x0 + 210, 632, 'コーヒー・お茶', 170, 22, (70, 50, 36))
         # Kleebis.
         dc.rectangle([x0 + 36, 670, x0 + 300, 700], fill=K['kleebiseTaust'])
         keskneTekst(dc, x0 + 168, 674, K['kleebis'], 250, 22, K['kleebiseTekst'], 1, shade(K['kleebiseTaust'], 0.4))
@@ -231,22 +222,22 @@ Korpuse värvid vastavad automaadi külgmaterjalidele. Juhuarvugeneraator on era
             D.text((px1 - 40, 588), '0', font=font(20), fill=fl)
         dc.rectangle([px0 + 20, 628, px0 + 50, 678], fill=(150, 152, 156))
         dc.rectangle([px0 + 32, 634, px0 + 38, 672], fill=(10, 10, 12))
-        dc.text((px0 + 18, 682), 'MÜNT', font=font(11), fill=(220, 220, 220))
+        keskneTekst(dc, px0 + 35, 684, '硬貨', 44, 12, (220, 220, 220))
         dc.rectangle([px0 + 62, 630, px1 - 14, 652], fill=(22, 22, 24), outline=(70, 150, 250), width=2)
         de.rectangle([px0 + 62, 630, px1 - 14, 652], outline=(60, 140, 240), width=2)
-        dc.text((px0 + 70, 656), '1000', font=font(11), fill=(220, 220, 220))
+        keskneTekst(dc, px0 + 92, 657, '千円札', 58, 12, (220, 220, 220))
         dc.ellipse([px0 + 72, 670, px0 + 96, 694], fill=(196, 40, 36))
         dc.ellipse([px0 + 77, 674, px0 + 87, 682], fill=(236, 120, 110))
         dc.rounded_rectangle([px0 + 14, 704, px1 - 14, 736], radius=5, fill=(34, 36, 40))
         de.rounded_rectangle([px0 + 14, 704, px1 - 14, 736], radius=5, outline=(40, 90, 160), width=1)
-        dc.rounded_rectangle([px0 + 24, 710, px0 + 60, 730], radius=4, fill=(230, 230, 226))
-        dc.text((px0 + 33, 711), 'IC', font=font(14), fill=(30, 60, 140))
+        dc.rounded_rectangle([px0 + 20, 709, px1 - 20, 731], radius=4, fill=(230, 230, 226))
+        keskneTekst(dc, (px0 + px1) / 2, 714, '電子マネー', px1 - px0 - 48, 14, (30, 60, 140))
         dc.rectangle([px0 + 50, 748, px0 + 120, 784], fill=(14, 14, 16))
         # Väljastusava: varikatus, küljed ja lävi luuakse geomeetriana.
         dc.rectangle([x0 + 70, 706, x0 + 340, 814], fill=(16, 16, 18))
         dc.rectangle([x0 + 78, 714, x0 + 332, 772], fill=(50, 52, 56))
         dc.rectangle([x0 + 78, 714, x0 + 332, 720], fill=(70, 72, 76))
-        keskneTekst(dc, x0 + 205, 736, 'VAJUTA', 120, 18, (200, 200, 196))
+        keskneTekst(dc, x0 + 205, 736, 'とりだし口', 120, 18, (200, 200, 196))
         dc.rectangle([x0 + 78, 776, x0 + 332, 806], fill=(9, 9, 10))
         # Alumine riba.
         dc.rectangle([x0 + 20, 846, x0 + 491, 862], fill=(70, 72, 74))
@@ -301,22 +292,22 @@ Korpuse värvid vastavad automaadi külgmaterjalidele. Juhuarvugeneraator on era
                            (cx_ + np.cos(t) * 78, cy_ + np.sin(t) * 78),
                            (cx_ + np.cos(t + 0.12) * 50, cy_ + np.sin(t + 0.12) * 50)], fill=(236, 120, 40))
             d.ellipse([cx_ - 44, cy_ - 44, cx_ + 44, cy_ + 44], fill=(222, 70, 38))
-            keskneTekst(d, SW / 2 + 40, 60, 'PÄIKE', SW - 170, 60, (44, 44, 48))
-            keskneTekst(d, SW / 2, 200, 'JOOGIAUTOMAAT', SW - 60, 34, (190, 40, 34))
-            keskneTekst(d, SW / 2, 560, 'JAHE', SW - 90, 36, (30, 80, 160))
+            keskneTekst(d, SW / 2 + 40, 60, 'ひなた', SW - 170, 60, (44, 44, 48))
+            keskneTekst(d, SW / 2, 200, '自動販売機', SW - 60, 34, (190, 40, 34))
+            keskneTekst(d, SW / 2, 560, 'つめた〜い', SW - 90, 36, (30, 80, 160))
         else:
             d.rectangle([16, 18, SW - 16, 120], fill=(28, 84, 156))
-            keskneTekst(d, SW / 2, 44, 'KÜLM JA KUUM', SW - 60, 44, (255, 255, 255))
+            keskneTekst(d, SW / 2, 44, 'ホット＆コールド', SW - 60, 44, (255, 255, 255))
             d.ellipse([110, 200, 260, 236], fill=(120, 80, 50))
             d.rounded_rectangle([130, 150, 240, 222], radius=16, fill=(236, 230, 220), outline=(120, 80, 50), width=4)
             d.arc([224, 164, 268, 204], start=270, end=90, fill=(120, 80, 50), width=6)
-            keskneTekst(d, SW / 2, 262, 'KOHV', SW - 70, 64, (96, 58, 34))
-            keskneTekst(d, SW / 2, 560, 'SOE', SW - 70, 40, (200, 40, 34))
+            keskneTekst(d, SW / 2, 262, 'コーヒー', SW - 70, 64, (96, 58, 34))
+            keskneTekst(d, SW / 2, 560, 'あったか〜い', SW - 70, 40, (200, 40, 34))
         d.rounded_rectangle([40, 350, SW - 40, 450], radius=14, fill=(250, 212, 58))
-        keskneTekst(d, SW / 2, 364, '100 ¥', SW - 110, 72, (200, 30, 30), 2, (120, 10, 10))
-        keskneTekst(d, SW / 2, 474, '80 ¥ / 50 ¥' if k == 0 else '120 ¥ / 130 ¥', SW - 70, 44, (200, 30, 30))
+        keskneTekst(d, SW / 2, 364, '100円', SW - 110, 72, (200, 30, 30), 2, (120, 10, 10))
+        keskneTekst(d, SW / 2, 474, '80円・50円' if k == 0 else '120円・130円', SW - 70, 44, (200, 30, 30))
         d.rectangle([40, 700, SW - 40, 760], fill=(244, 244, 240))
-        keskneTekst(d, SW / 2, 714, 'AUTOMAAT 26-%d' % (k + 1), SW - 100, 22, (40, 40, 44))
+        keskneTekst(d, SW / 2, 714, '管理番号 26-%d' % (k + 1), SW - 100, 22, (40, 40, 44))
         A_ = np.asarray(im).astype(np.float32)
         gs = np.clip((np.arange(H, dtype=np.float32)[:, None] - 520) / 352, 0, 1)
         A_ *= (1 - 0.18 * gs ** 1.5)[..., None]
@@ -346,10 +337,11 @@ def suletudSilt():
     im = Image.new('RGBA', (w, h), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
     d.rounded_rectangle([4, 4, w - 5, h - 5], radius=14, fill=(244, 244, 240, 255), outline=(200, 30, 36, 255), width=12)
-    for txt, f, y, c in (('EDASI', font(74), 40, (25, 25, 30)), ('TEE', font(118), 150, (205, 28, 34)),
-                         ('SULETUD', font(52), 290, (205, 28, 34)), ('VABANDAME EBAMUGAVUSE PÄRAST', font(12), 440, (40, 40, 46))):
-        b = d.textbbox((0, 0), txt, font=f)
-        d.text(((w - (b[2] - b[0])) / 2 - b[0], y), txt, font=f, fill=c)
+    # «Edasi tee suletud»: この先 / 通行止め, juhis ümbersõiduks ja vabandus.
+    for txt, size, cy, c in (('この先', 72, 80, (25, 25, 30)), ('通行止め', 80, 190, (205, 28, 34)),
+                             ('迂回してください', 34, 318, (25, 25, 30)), ('ご迷惑をおかけします', 20, 448, (40, 40, 46))):
+        keskel(d, w / 2, cy, txt, font(size), c)
+    d.rectangle([40, 256, w - 41, 262], fill=(205, 28, 34, 255))
     save(im, 'suletud_silt.png')
 
 
@@ -365,11 +357,14 @@ def ruloo():
     a[:, -6:] *= 0.6
     a[-18:] = a[-18:] * 0.5
     im = Image.fromarray(np.clip(a, 0, 255).astype(np.uint8))
-    d = ImageDraw.Draw(im)
-    d.rectangle([300, 150, 380, 262], fill=(236, 232, 218))
-    d.text((312, 160), 'ÄRIPIND', font=font(15), fill=(30, 30, 30))
-    d.text((318, 190), 'ÜÜRILE', font=font(16), fill=(190, 30, 30))
-    d.text((308, 236), '03-xxxx', font=font(13), fill=(40, 40, 40))
+    # Teade «テナント募集中»: rulootekstuur venib mudelil laiuses umbes 1,8 korda (5,0 × 2,6 m ja
+    # 4,4 × 2,6 m), seepärast joonistatakse teade laiemana ja surutakse 80 × 112 piksli alale.
+    teade = Image.new('RGB', (288, 224), (236, 232, 218))
+    dt = ImageDraw.Draw(teade)
+    keskel(dt, 144, 40, 'テナント', font(40), (30, 30, 30))
+    keskel(dt, 144, 106, '募集中', font(58), (190, 30, 30))
+    keskel(dt, 144, 180, '03-0000-0000', font(26), (40, 40, 40))
+    im.paste(teade.resize((80, 112), Image.LANCZOS), (300, 150))
     save(im, 'ruloo.jpg')
 
 
@@ -378,10 +373,7 @@ def poesilt():
     im = Image.new('RGB', (w, h), (30, 42, 66))
     d = ImageDraw.Draw(im)
     d.rectangle([0, 0, w - 1, h - 1], outline=(200, 200, 205), width=3)
-    t = 'UDU KEEMILINE PUHASTUS'
-    f = font(44)
-    b = d.textbbox((0, 0), t, font=f)
-    d.text(((w - (b[2] - b[0])) / 2 - b[0], (h - (b[3] - b[1])) / 2 - b[1]), t, font=f, fill=(236, 236, 230))
+    keskel(d, w / 2, h / 2, '霧島クリーニング', font(44), (236, 236, 230), vahe=14)
     save(im, 'poesilt.png')
 
 
