@@ -1,6 +1,6 @@
-# Aktiivne töö: arhitektuur ja nähtavad geomeetriavead
+# Ülesanded: arhitektuur, tee ja mängumaailma kirjad
 
-**Tehtud (versioon 0.6.0).** Need kuus parandusrühma pärinevad versiooni 005 üleandmisest; paketi 0.5.1 tõlge ja korrastus neid ei teostanud, versioon 0.6.0 teostas kõik kuus. Tulemused ja piirangud on failis [SEIS.md](SEIS.md). Võrdluspildid on alles failis [viited/README.md](viited/README.md).
+**Tehtud (versioonid 0.6.0 ja 0.7.0).** Rühmad 1–6 pärinevad versiooni 005 üleandmisest ja tehti versioonis 0.6.0. Rühmad 7–9 (tee ja ristmik pargi juures, H2 akna ees olev seinajupp, jaapanikeelsed kirjad) tehti versioonis 0.7.0. Tulemused ja piirangud on failis [SEIS.md](SEIS.md), võrdluspildid failis [viited/README.md](viited/README.md).
 
 ## Eesmärk ja piirid
 
@@ -53,7 +53,7 @@ Funktsiooni `looH1` parapeti `plaanikast` kasutab tahke `SNT`, mis jätab põhja
 
 ## 4. Pargi põhikuju ja proportsioonid
 
-- [x] Plaan ja võrreldav tänavavaade kontrollitud (0.6.0): park on 9,6 × 19 m piklik riba viltu lõigatud kagunurgaga; proportsioonimuutus ja ebakindlus on kirjas failis SEIS.md.
+- [x] Plaan ja võrreldav tänavavaade kontrollitud (0.6.0): park on 9,6 × 19 m piklik riba viltu lõigatud kagunurgaga; proportsioonimuutus ja ebakindlus on kirjas failis SEIS.md. Versioonis 0.7.0 asendas selle rühma 7 kiilukujuline park E2 ääres.
 
 Pildid: `viited/aktiivne/05a_pargi_eeskuju.png` ja `05b_pargi_praegune_kuju.png`. Taust: `viited/taust/12_satelliidivaade.png` ja `11_hoonete_ja_tanava_asetus.png`.
 
@@ -87,6 +87,36 @@ Kasuta geomeetriat või kohapeal genereeritud retrostiiliga sobivat tekstuuri. S
 
 **Vastuvõtt:** kiviread on selged nii lähivaates kui tavalisel jalutamiskaugusel, sealhulgas nurgas.
 
+## 7. Tee, E2 ja ristmik pargi juures
+
+- [x] Ümber ehitatud ja kontrollitud (0.7.0): E2 hargneb peatänavast pargi tänavapoolse otsa juures ja kulgeb umbes 25° põhjast itta pargi ning kivipiirde vahel. Park on kiil: lõunaots 7,9 m, põhjaots 15,5 m, pikkus 19 m; idaserv on E2 äärekivi 0,9 m tellisriba taga. Pealtvaade, tänavavaade pargi nurgalt ning kõnd ja jooks S → J → E2 on kontrollitud.
+
+Pilt: `viited/aktiivne/08_tee_ja_ristmik_margitud.jpg` (kasutaja märgitud mänguvaade). Taust: `viited/taust/12_satelliidivaade.png`, `11_hoonete_ja_tanava_asetus.png` ja `viited/aktiivne/05a_pargi_eeskuju.png`. Kasutaja saatis vestluses ka märgitud satelliidivaate ja tänavavaate pargi nurgalt; kolmanda osapoole kaardipilte avalikku repositooriumi ei lisatud.
+
+Tee pargi juures, selle pöörded ja ristmiku laius ei vastanud päriskohale: E2 kulges umbes 6 m ida pool, pargi ja E2 vahele jäi asfaldikiil ning pargi nurk oli täisnurkne. Ehita piirkonna teegeomeetria uuesti satelliidivaate põhikuju ja tänavavaate proportsioonide järgi. Kitsas E2 hargneb pargi tänavapoolse otsa juures ja kulgeb pargi ning kivipiirde vahel; pargi idaserv järgib E2-d ning pargi ja aia nurgad on ümardatud. Kõnniteed, äärekivid, servajooned, peatumisjoon, kõrguskaart, kokkupõrked, postid, valgustid ja püsivaated järgivad uut kuju.
+
+**Vastuvõtt:** pealtvaates on park kiil ning E2 jookseb pargi ja aia vahel ilma asfaldikiiluta. Tänavavaade pargi nurgalt sarnaneb eeskujuga. Kõnd ja jooks S → J → E2 jõuavad tõkkeni.
+
+## 8. H2 esimese korruse akna ees olev seinajupp
+
+- [x] Eemaldatud ja kontrollitud (0.7.0): rõduribade vahelised otsaseinad algavad arkaadi lae kõrguselt ning ainult hoone otste seinad ulatuvad maani. Kokkupõrkekehad on vaid maani ulatuvatel seintel. `npm test` kinnitab kiirtega, et esimese korruse aknad paistavad tänavalt mitmest suunast; brauseris pääseb endise seinajupi kohalt läbi.
+
+Pilt: `viited/aktiivne/09_H2_akna_ees_sein.jpg`.
+
+Punasega märgitud seinajupp varjas H2 esimese korruse akent. Eemalda see koos kokkupõrkekehaga. Rõdude otsaseinad ülemistel korrustel ja hoone otste seinad jäävad alles.
+
+**Vastuvõtt:** aken paistab eest ja küljelt ning seinajupi kohalt saab kõndida.
+
+## 9. Jaapanikeelsed kirjad mängumaailmas
+
+- [x] Tehtud ja kontrollitud (0.7.0): peatumismärgil ja teekirjal on 「止まれ」, tõkete plakatil 「この先 通行止め」. Jaapani keeles on ka automaatide esi- ja külgpaneelid, maja nimesilt, poesilt ja rulooteade; helenduskaart on loodud uuesti. Kirjad on lähedalt ja tavaliselt mängukauguselt loetavad, õiget pidi ega ole peegelpildis.
+
+Pildid: `viited/aktiivne/10a_peatumismark_ja_teekiri.png`, `10b_tokke_silt.png`, `10c_joogiautomaadid.png` ja `10d_maja_nimesilt.png`.
+
+Mängumaailmas füüsiliselt nähtavad kirjad peavad olema jaapani keeles. Peatumiskirja jaoks kasuta 「止まれ」, läbipääsukeelu jaoks 「通行止め」. Menüüd, juhtimisjuhised, HUD, pealtvaate tähised, arendusdokumendid, koodikommentaarid ja vastused jäävad eesti keelde. Joonista kirjad tekstuurigeneraatorites kohaliku jaapani fondiga; ära lisa mängule välist fondi- ega võrgusõltuvust.
+
+**Vastuvõtt:** kõik füüsilised kirjad on jaapani keeles, mahuvad oma alale ja on mudeli igal nähtaval küljel õiget pidi. Puuduva märgi kaste ei ole.
+
 ## Teostus ja lõplik kontroll
 
 Enne muutmist tutvu koostajate, geomeetria abifunktsioonide, materjalirühmade ja kokkupõrkereeglitega. Olulised failid: `kood/hooned.js`, `seaded.js`, `taimestik.js`, `tanav.js`, `maapind.js`, `varad.js`, `geomeetria.js` ja `maailm.js` samas kaustas. Vajadusel uuenda ka püsivaateid ja pealtvaate tähiseid.
@@ -94,7 +124,7 @@ Enne muutmist tutvu koostajate, geomeetria abifunktsioonide, materjalirühmade j
 - Käivita `npm test`: stseen ja tegelane peavad moodustuma ilma vigase geomeetriata.
 - Käivita brauseris; kontrolli puuduvaid varasid ning lehe- ja konsoolivigu.
 - Kõnni ja jookse S → J ning mõlemas harus. Lähene H1-le, läbi pargi käiguteed ja H2 esiväljak. Kontrolli tegelase ja kaamera kokkupõrkeid, sissepääse ning kaamera sattumist seintesse.
-- Kontrolli kõigi kuue rühma vastuvõtutingimusi sobitatud vaatenurkadest. Plaanimuutuste jaoks kasuta varjamata pealtvaadet. Säilita mängu õhustik.
+- Kontrolli kõigi rühmade vastuvõtutingimusi sobitatud vaatenurkadest. Plaanimuutuste jaoks kasuta varjamata pealtvaadet. Säilita mängu õhustik.
 - Kontrolli tegelase vöö- ja seelikupiirkonda seistes, kõndides ja joostes ning automaatide ülapindu.
 - Kontrollide proovipunktid peavad vastama uuele geomeetriale. Ära nõrgenda sisulisi tingimusi ainult läbimise saavutamiseks.
 
@@ -102,6 +132,6 @@ CPU-kontroll ei tõenda visuaalset vastavust, nähtavate normaalide õigsust ega
 
 ## Üleandmine
 
-Anna üle lõplikud repositooriumimuudatused, uuendatud SEIS.md ning tegelikud kontrollitulemused. Tõenda H1 sissepääsu, fassaadi ja alapindu, parki tänavalt ja ülalt, H2 astmeid tänavalt ja ülalt, aia alust ja nurka ning üht tavalist mänguvaadet. Mõni hästi valitud vaade võib katta mitu tingimust. Vilkumise kontroll eeldab kaamera liikumist, ühest kaadrist ei piisa.
+Anna üle lõplikud repositooriumimuudatused, uuendatud SEIS.md ning tegelikud kontrollitulemused. Tõenda H1 sissepääsu, fassaadi ja alapindu, parki ja E2 tänavalt ja ülalt, H2 astmeid tänavalt ja ülalt, H2 esimese korruse akent, aia alust ja nurka, jaapanikeelseid kirju ning üht tavalist mänguvaadet. Mõni hästi valitud vaade võib katta mitu tingimust. Vilkumise kontroll eeldab kaamera liikumist, ühest kaadrist ei piisa.
 
 Kõik tõendid peavad vastama lõplikule koodile. Märgi ajalooline materjal ja tegemata kontrollid selgelt. Ära nimeta kogu etappi valmis, kui nõuded pole kontrollitud. Uus ZIP on vajalik ainult kasutaja vastava soovi korral; ära lisa repositooriumi vanu arhiive või vahetulemusi.
