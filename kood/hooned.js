@@ -125,13 +125,13 @@ export function looH1(B, ctx) {
   B.add('hallMetall', cyl(X1 + 0.08, yb + 0.3, 0, 0.05, 0.05, TOP + 0.6, 6));
   B.add('hallMetall', cyl(X0 - 0.08, yb + 0.25, 0, 0.05, 0.05, TOP + 0.6, 6));
 
-  // Nimesilt ja seinavalgusti süvise tagaseinal, lillepeenar süvise ees fassaadijoonest väljas.
+  // Nimesilt ja seinavalgusti süvise tagaseinal; lillepeenar süvise vasakus otsas fassaadijoonest väljas, parem pool jääb käidavaks.
   B.add('tumeMetall', fassaadikast('S', wy, -23.05, -21.25, 1.28, 1.92, 0, 0.025));
   B.add('nimesilt', fassaadinelinurk('S', wy - 0.03, -22.15, 1.7, 1.32, 1.88));
   B.add('lambiKlaas', fassaadikast('S', wy, PW - 0.62, PW - 0.36, 2.05, 2.4, 0, 0.09));
-  B.add('tumeGraniit', plaanikast(-23.8, -20.9, Y0 - 1.5, Y0 - 0.2, 0, 0.45, { faces: 'NSEWT' }));
-  hekirida(B, -23.7, -21.0, Y0 - 1.4, Y0 - 0.3, 0.95, 31);
-  col.box(-23.8, -20.9, Y0 - 1.5, Y0 - 0.2, 0.9, 'planter');
+  B.add('tumeGraniit', plaanikast(-23.8, -22.3, Y0 - 1.5, Y0 - 0.2, 0, 0.45, { faces: 'NSEWT' }));
+  hekirida(B, -23.7, -22.4, Y0 - 1.4, Y0 - 0.3, 0.95, 31);
+  col.box(-23.8, -22.3, Y0 - 1.5, Y0 - 0.2, 0.9, 'planter');
   light(ctx, PW - 0.49, wy - 0.4, 2.2, 0xffc890, 2.5, 4.5);
 
   // Läbipääsu alguses postkastid ja fonolukk, küljel klaasuks trepikotta, laes valgustid.

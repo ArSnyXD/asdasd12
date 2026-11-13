@@ -1,8 +1,8 @@
 # Alles jäetud võrdlusmaterjal
 
-Need pildid on vajalikud failis [ULESANDED.md](../ULESANDED.md) kirjeldatud veel tegemata parandusteks. Need ei ole mängu tekstuurid ega tõendid uute paranduste valmimise kohta. Pildifailid on algsel kujul; tõlgitud on nimed ja selgitused.
+Need pildid olid failis [ULESANDED.md](../ULESANDED.md) kirjeldatud paranduste eeskujud ja veanäited. Parandused on versioonis 0.6.0 tehtud (vt [SEIS.md](../SEIS.md)); pildid on alles kasutaja ülevaatuseks ja hilisemaks võrdluseks. Need ei ole mängu tekstuurid ega tõendid uute paranduste valmimise kohta; tõendid luuakse uuesti käsuga `node tooriistad/vaatekontroll.mjs`. Pildifailid on algsel kujul; tõlgitud on nimed ja selgitused.
 
-## Aktiivsed pildid
+## Paranduste võrdluspildid (tööd tehtud versioonis 0.6.0)
 
 | Fail | Mille kontrollimiseks |
 | --- | --- |
@@ -30,4 +30,4 @@ Need pildid on vajalikud failis [ULESANDED.md](../ULESANDED.md) kirjeldatud veel
 | [11_hoonete_ja_tanava_asetus.png](taust/11_hoonete_ja_tanava_asetus.png) | Pargi ja H2 seos tänavaga |
 | [12_satelliidivaade.png](taust/12_satelliidivaade.png) | Pargi ning H2 proportsioonid ja asendiplaan |
 
-Eemaldatud on vana teekonna skeem, tegelase stiiliviide ja automaatide viitefoto, sest need tööd on alusversioonis juba olemas. Eemaldatud on ka ajaloolised kontrollpildid, video, vanad JSON-aruanded, pakendamise kontrollsummad ja taastamise ajutised tööriistad. Nende asemel on kaasas praeguse struktuuriga toimiv stseeni kontroll. Aktiivseid pilte tohib eemaldada pärast vastava töö kontrollitud valmimist ja dokumentide viidete uuendamist.
+Eemaldatud on vana teekonna skeem, tegelase stiiliviide ja automaatide viitefoto, sest need tööd on alusversioonis juba olemas. Eemaldatud on ka ajaloolised kontrollpildid, video, vanad JSON-aruanded, pakendamise kontrollsummad ja taastamise ajutised tööriistad. Kuue parandusrühma pildid võib eemaldada pärast kasutaja ülevaatust, uuendades ka selle faili ja ULESANDED.md viited.

@@ -1,6 +1,6 @@
 # Aktiivne töö: arhitektuur ja nähtavad geomeetriavead
 
-**Ootel.** Need kuus parandusrühma pärinevad versiooni 005 üleandmisest. Paketi 0.5.1 tõlge ja korrastus neid ei teostanud. Vaata [viidete loendit](viited/README.md), kõiki kümmet aktiivset pilti ning iga töö juures nimetatud taustapilte.
+**Tehtud (versioon 0.6.0).** Need kuus parandusrühma pärinevad versiooni 005 üleandmisest; paketi 0.5.1 tõlge ja korrastus neid ei teostanud, versioon 0.6.0 teostas kõik kuus. Tulemused ja piirangud on failis [SEIS.md](SEIS.md). Võrdluspildid on alles failis [viited/README.md](viited/README.md).
 
 ## Eesmärk ja piirid
 
@@ -12,7 +12,7 @@ Uusimad kasutaja märgitud pildid on olulisemad kui vanad plaanid või varasemad
 
 ## 1. H1 kattuvad pinnad ja vilkumine
 
-- [ ] Parandatud ja liikuva kaameraga kontrollitud.
+- [x] Parandatud ja liikuva kaameraga kontrollitud (0.6.0): läbipääsu pargipoolne sein algab nurgaposti tagant, vahesein seisab parapeti taga; `npm test` kinnitab, et kattuvaid samatasapinnalisi pindu ei ole; kuvatõmmised retrofiltriga ja ilma.
 
 Pildid: `viited/aktiivne/01_H1_sissepaasu_vilkumine.png` ja `02_H1_sissepaasu_ja_rodu_vilkumine.png` samas kaustas.
 
@@ -29,7 +29,7 @@ Need on koodi põhjal leitud lähtekohad, mitte lõplik visuaalne diagnoos. Otsi
 
 ## 2. H1 vasak madal süvis esimesel korrusel
 
-- [ ] Parandatud ja eest ning nurga alt kontrollitud.
+- [x] Parandatud ja eest ning nurga alt kontrollitud (0.6.0): vasak osa on 1 m sügavune süvis sildi, valgusti ja postiga, parem läbipääs 12 m sügav.
 
 Pilt: `viited/aktiivne/03_H1_vasak_madal_suvis.png`. Taust: `viited/taust/01_H1_pohiplaan.png`, `02_H1_fassaad.png` ja `03_H1_sissepaas.png`.
 
@@ -41,7 +41,7 @@ Sobita tagasein, külgseinad, lagi, nimesilt, valgustus, istutuskastid ja lähen
 
 ## 3. H1 rõdude alapinnad ja avatud servad
 
-- [ ] Kõik korduvad detailid kontrollitud.
+- [x] Kõik korduvad detailid kontrollitud (0.6.0): parapettidel ja pööninguparapetil on alapinnad, plaadi alapind algab parapeti tagant, vaheseinal on suletud küljed; kuus korrust madalalt ja mõlemast otsast üle vaadatud.
 
 Pilt: `viited/aktiivne/04_H1_rodu_puuduvad_alapinnad.png`.
 
@@ -53,11 +53,11 @@ Funktsiooni `looH1` parapeti `plaanikast` kasutab tahke `SNT`, mis jätab põhja
 
 ## 4. Pargi põhikuju ja proportsioonid
 
-- [ ] Plaan ja võrreldav tänavavaade kontrollitud.
+- [x] Plaan ja võrreldav tänavavaade kontrollitud (0.6.0): park on 9,6 × 19 m piklik riba viltu lõigatud kagunurgaga; proportsioonimuutus ja ebakindlus on kirjas failis SEIS.md.
 
 Pildid: `viited/aktiivne/05a_pargi_eeskuju.png` ja `05b_pargi_praegune_kuju.png`. Taust: `viited/taust/12_satelliidivaade.png` ja `11_hoonete_ja_tanava_asetus.png`.
 
-Park erineb endiselt päriskohast. Hinda uuesti pikkuse ja laiuse suhet, tänavapoolset otsa, nurka, sügavust H1 kõrval ning E2-poolset piiri. Eesmärk on piklik väljak H1 kõrval; praegune kuju mõjub liiga laia ja peaaegu ruudukujulisena. Ära pööra kogu parki lihtsalt uuesti 90° ega pea ainult laiuse muutmist vastavuse tõendiks.
+Enne parandust erines park päriskohast. Hinda uuesti pikkuse ja laiuse suhet, tänavapoolset otsa, nurka, sügavust H1 kõrval ning E2-poolset piiri. Eesmärk on piklik väljak H1 kõrval; praegune kuju mõjub liiga laia ja peaaegu ruudukujulisena. Ära pööra kogu parki lihtsalt uuesti 90° ega pea ainult laiuse muutmist vastavuse tõendiks.
 
 Võrdle samast suunast, sest perspektiiv moonutab laiust. Säilita kuus puud, valged avatud raamid, istutusavad, sillutis, pingid ja postid. Paiguta need parandatud põhikujus kooskõlaliselt ümber ilma tarbetu ümberkujundamiseta. Hoia käiguteed kasutatavad ja liited mõlema tänava ning H1-ga puhtad. Uuenda liikunud objektide kokkupõrkekehi.
 
@@ -65,7 +65,7 @@ Võrdle samast suunast, sest perspektiiv moonutab laiust. Säilita kuus puud, va
 
 ## 5. H2 astmeline tänavafassaad
 
-- [ ] Astmed on nähtavad plaanis ja hoone kehas.
+- [x] Astmed on nähtavad plaanis ja hoone kehas (0.6.0): kaks eenduvat rõdudega osa, 1,4 m tagasiastuv vahe ja 1,1 m tagasiastuv ristmikupoolne ots; katus ja parapetid järgivad astmeid.
 
 Pildid: `viited/aktiivne/06a_H2_astmelise_fassaadi_eeskuju.png` ja `06b_H2_praegune_sirge_fassaad.png`. Taust: `viited/taust/04_H2_materjal.png`, `08_H2_ristmikupoolne_ots.png`, `10_H2_esivaljak.png`, `11_hoonete_ja_tanava_asetus.png` ja `12_satelliidivaade.png`.
 
@@ -77,7 +77,7 @@ Kooskõlasta põhimaht, rõdud, plaadid, piirded, sambad, aknad, esimese korruse
 
 ## 6. Aia kivisokkel ristmikul J
 
-- [ ] Kiviread, proportsioonid ja nurk kontrollitud.
+- [x] Kiviread, proportsioonid ja nurk kontrollitud (0.6.0): kolm rida tahutud plokke nihutatud vuukidega, 0,95 m sokkel ja balustraad karniisil; nurgas järgivad plokid kaart ilma venimata.
 
 Pildid: `viited/aktiivne/07a_aia_kivisokli_eeskuju.png` ja `07b_aia_praegune_sokkel.png`.
 

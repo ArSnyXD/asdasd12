@@ -59,7 +59,7 @@ export const PARK = {
   nurgaLoige: [3.2, 5.5],                          // Kagunurga viltu lõige: pikkus piki tänavat ja piki idaserva.
   trees: [[-13.3, 7.4], [-8.5, 7.4], [-13.3, 13.0], [-8.5, 13.0], [-13.3, 18.6], [-8.5, 18.6]],
   frames: [[-10.9, 10.2], [-10.9, 15.8]],
-  blocks: [[-10.9, 10.2, 1.57], [-10.9, 15.8, 1.57], [-10.9, 6.2, 0], [-10.9, 20.8, 0]],
+  blocks: [[-10.9, 10.2, 1.57], [-10.9, 15.8, 1.57], [-12.0, 6.0, 1.57], [-12.0, 21.2, 1.57]],   // Otsmised plokid jätavad tänavapoolse sissepääsu vabaks.
 };
 
 // Suured puud aia taga; templit ei ehitata. [X, Y, kõrgus, võra raadius]

@@ -2,7 +2,7 @@
 
 Väike brauseris töötav Three.js-i stseen, milles saab jalutada kolmanda isiku vaates. Projekt sisaldab kogu mängukoodi, kohalikke tekstuure ja Three.js r160 teeki. Mängimiseks pole võrguühendust ega pakettide allalaadimist vaja.
 
-See on versiooni 005 eestikeelne ja korrastatud jätkuprojekt, paketi versioon **0.5.1**. Kuus arhitektuuriparandust on endiselt tegemata: vt [ÜLESANDED](ULESANDED.md). Lokaliseerimine ei tähenda nende valmimist.
+See on versiooni 005 eestikeelne jätkuprojekt, paketi versioon **0.6.0**. Kuus arhitektuuriparandust (H1 kattuvad pinnad, vasak süvis ja rõdude alapinnad, pargi kuju, H2 astmeline fassaad, aia kivisokkel) on teostatud ja kontrollitud: vt [ÜLESANDED](ULESANDED.md) ja [SEIS](SEIS.md).
 
 ## Käivitamine
 
@@ -46,7 +46,7 @@ Menüüst saab muuta kvaliteeti ning lülitada udu ja retrofiltri. Püsivaadete 
 ## GitHub ja Hoplite
 
 1. Paki arhiiv lahti. Laadi **selle sisu**, sealhulgas `index.html`, `package.json`, `AGENTS.md` ja kõik alamkaustad, repositooriumi juurkausta. Ära laadi ainult ZIP-faili.
-2. Säilita `teegid/` ja `varad/`: need on mängu käivitamiseks vajalikud. `viited/` sisaldab alles tegemata tööde võrdluspilte.
+2. Säilita `teegid/` ja `varad/`: need on mängu käivitamiseks vajalikud. `viited/` sisaldab tehtud paranduste võrdluspilte.
 3. Ühenda see repositoorium Hoplite’iga. Kui keskkond küsib käivituskäsku, kasuta `npm start`; koostamisetappi pole. Eelvaate juur on repositooriumi juur.
 4. Anna agendile failis [JATKA.txt](JATKA.txt) olev juhis. Agent peab lugema [AGENTS.md](AGENTS.md), [SEIS.md](SEIS.md) ja [ULESANDED.md](ULESANDED.md).
 
@@ -61,8 +61,8 @@ See pakett ei loo ise repositooriumi, ei avalda saiti ega ühenda Hoplite’i ko
 | `stiil/kujundus.css` | Kasutajaliidese kujundus |
 | `varad/tekstuurid/` | Mängus kasutatavad tekstuurid, eestikeelsed sildid ja automaadid |
 | `teegid/three/` | Muutmata kohalik Three.js-i sõltuvus koos algse litsentsiga |
-| `tooriistad/` | Server, stseeni kontroll ja tekstuurigeneraatorid |
-| `viited/` | Praeguse ülesande kümme pilti ja kaheksa vajalikku taustafotot |
+| `tooriistad/` | Server, stseeni kontroll, kattuvate pindade kontroll, valikulised brauseri- ja vaatekontrollid ning tekstuurigeneraatorid |
+| `viited/` | Kuue parandusrühma kümme võrdluspilti ja kaheksa taustafotot |
 
 ## Kontrollid ja tekstuurid
 
@@ -70,9 +70,9 @@ See pakett ei loo ise repositooriumi, ei avalda saiti ega ühenda Hoplite’i ko
 npm test
 ```
 
-Kui arenduskeskkonnas on Playwright koos Chromiumiga juba olemas, saab töötava serveri kõrval käivitada ka `node tooriistad/brauserikontroll.mjs`. Vajadusel määra mängu aadress muutujaga `MANGU_AADRESS` ja brauseri käivitusfail muutujaga `BRAUSERI_FAIL`. See valikuline kontroll proovib kasutajaliidest, kõndi, jooksu, seadeid ja püsivaateid. Selles üleandmiskeskkonnas jäi see brauseri käivituspiirangu tõttu läbimata.
+Kui arenduskeskkonnas on Playwright koos Chromiumiga juba olemas, saab töötava serveri kõrval käivitada ka `node tooriistad/brauserikontroll.mjs`. Vajadusel määra mängu aadress muutujaga `MANGU_AADRESS` ja brauseri käivitusfail muutujaga `BRAUSERI_FAIL`. See valikuline kontroll proovib kasutajaliidest, kõndi, jooksu, seadeid ja püsivaateid; versioonis 0.6.0 läbis see Hoplite’i liivakastis päises Chrome’is. Samas keskkonnas töötab ka `node tooriistad/vaatekontroll.mjs`, mis salvestab vastuvõtuvaadete ja tegelase pooside kuvatõmmised kausta `kontrollivaljund/` (valikud `RETRO=0|1`, `FOG=0|1`).
 
-Põhikontroll koostab stseeni ja tegelase, otsib vigaseid geomeetriaarve ja indekseid ning proovib kõndi ja animatsiooni. See ei asenda visuaalset kontrolli. Selle paketi tegelikud tulemused on failis [SEIS.md](SEIS.md).
+Põhikontroll koostab stseeni ja tegelase, otsib vigaseid geomeetriaarve ja indekseid, proovib kõndi ja animatsiooni ning kontrollib kattuvaid samatasapinnalisi pindu (`tooriistad/kattuvus.mjs`), H1 süvise ja läbipääsu kokkupõrkeid, pargi proportsioone, H2 astmeid ja aia kõrgust. See ei asenda visuaalset kontrolli. Selle paketi tegelikud tulemused on failis [SEIS.md](SEIS.md).
 
 Tekstuuride uuesti loomiseks on vaja Pythonit ning NumPy ja Pillow’ teeke. Tavaliseks mängimiseks neid vaja ei ole. Kõik tekstuurid on juba kaasas.
 
