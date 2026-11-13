@@ -51,12 +51,15 @@ export function h2Plaan(x, y) {
 }
 
 // Kuus pargipuud kahes kolmeses reas piki H1 külgseina; pargi pikk telg kulgeb E2 suunas.
-// Lühike külg avaneb S–J tänavale, raamid ja plokid paiknevad puuridade vahel.
+// Satelliidi- ja tänavavaate järgi on park kitsas piklik riba (laius umbes 9–10 m, pikkus umbes 19 m):
+// lühike külg avaneb S–J tänavale, idaserv on sirge ja tänavapoolne nurk on viltu lõigatud.
+// E2 sõidutee jääb pargist idas kaugemale kui fotodel; vahele jääb asfaltlaiend, sest tee ja aia asetust ei muudeta.
 export const PARK = {
-  X0: -15.3, Y0: 4.4, Y1: 23.4,                   // Plaadiala lääneserv H1 seina juures ning lõuna- ja põhjapiir.
-  trees: [[-12.4, 8.0], [-6.6, 8.0], [-12.4, 13.6], [-6.6, 13.6], [-12.4, 19.2], [-6.6, 19.2]],
-  frames: [[-9.5, 10.8], [-9.5, 16.4]],
-  blocks: [[-9.5, 10.8, 1.57], [-9.5, 16.4, 1.57], [-9.5, 6.9, 0], [-9.5, 20.6, 0]],
+  X0: -15.3, X1: -5.7, Y0: 4.4, Y1: 23.4,         // Plaadiala lääneserv H1 seina juures, idaserv ning lõuna- ja põhjapiir.
+  nurgaLoige: [3.2, 5.5],                          // Kagunurga viltu lõige: pikkus piki tänavat ja piki idaserva.
+  trees: [[-13.3, 7.4], [-8.5, 7.4], [-13.3, 13.0], [-8.5, 13.0], [-13.3, 18.6], [-8.5, 18.6]],
+  frames: [[-10.9, 10.2], [-10.9, 15.8]],
+  blocks: [[-10.9, 10.2, 1.57], [-10.9, 15.8, 1.57], [-10.9, 6.2, 0], [-10.9, 20.8, 0]],
 };
 
 // Suured puud aia taga; templit ei ehitata. [X, Y, kõrgus, võra raadius]
@@ -91,7 +94,7 @@ export const VAATED = {
   aed:   { name: 'Ristmik → aed', pos: [-7.0, 0.9, 2.3], look: [9.0, -0.5, 5.0], fov: 55 },
   h1:      { name: 'H1: fassaad', pos: [-18.2, -2.2, 1.6], look: [-20.4, 8.6, 7.4], fov: 64 },
   h1Sissepaas:  { name: 'H1: esiväljak ja läbipääs', pos: [-17.6, 3.0, 1.6], look: [-18.5, 16.0, 1.4], fov: 58 },
-  park:    { name: 'Park H1 kõrval', pos: [-13.6, 2.4, 1.8], look: [-6.0, 20.0, 3.2], fov: 60 },
+  park:    { name: 'Park H1 kõrval', pos: [-12.6, 1.6, 1.8], look: [-9.4, 20.0, 3.0], fov: 60 },
   h2Kulg:  { name: 'H2 E1 poolt', pos: [9.6, -3.2, 1.7], look: [-7.0, -9.0, 6.0], fov: 56 },
   h2Esiväljak: { name: 'H2: esiväljak', pos: [...h2Plaan(15.5, 7.4), 1.6], look: [...h2Plaan(15.0, 0.0), 5.5], fov: 60 },
   automaadid: { name: 'Joogiautomaadid', pos: [-17.4, 0.3, 1.55], look: [-19.5, -4.0, 1.0], fov: 50 },
@@ -103,7 +106,7 @@ export const TAHISED = [
   { id: 'J', text: 'J — ristmik', at: [0.6, -0.4] },
   { id: 'H1', text: 'H1 — hoone 1 (6 korrust)', at: [-20.3, 20.0] },
   { id: 'H2', text: 'H2 — hoone 2 (7 korrust)', at: h2Plaan(10.0, -6.0) },
-  { id: 'P', text: 'P — väikepark, 6 puud', at: [-9.5, 13.5] },
+  { id: 'P', text: 'P — väikepark, 6 puud', at: [-10.9, 13.0] },
   { id: 'E1', text: 'E1 — tänava jätk kagusse', at: [20.6, -10.0] },
   { id: 'E2', text: 'E2 — põhjapoolne haru', at: [4.7, 25.0] },
   { id: 'V', text: 'joogiautomaadid', at: h2Plaan(2.1, 0.6), cls: 'dim' },

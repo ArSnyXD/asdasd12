@@ -46,8 +46,8 @@ const light = (ctx, X, Y, h, color, intensity, distance) => ctx.lights.push({ X,
 
 // H1.
 // Kitsas ots tänavale, kõrge sügav maht põhja ja täiskõrguses tumedad nurgapostid.
-// Elukorruste kaheosalised rõdud plaaditud parapeti ja valge vaheseinaga.
-// Esimesel korrusel vasakul sildi ja lillepeenraga sein, paremal avatud majaalune läbipääs.
+// Elukorruste kaheosalised rõdud plaaditud parapeti ja valge vaheseinaga; vahesein seisab parapeti taga.
+// Esimesel korrusel vasakul madal süvis sildi ja lillepeenraga, paremal sügav avatud majaalune läbipääs.
 // Läbipääs on sügav, pargi pool betoonsein ja laes valgustid.
 export function looH1(B, ctx) {
   const R = rng(101), col = ctx.col;
@@ -56,16 +56,20 @@ export function looH1(B, ctx) {
   const gb = [X0, X1, Y0, Y1, 0, TOP + 0.9];
   const PIL = 0.72, BD = 1.15, XD = -20.3, NW = PASS.X0, ND = PASS.depth, NH = PASS.H;
   const BX0 = X0 + PIL, BX1 = X1 - PIL, NE = PASS.X1, yb = Y0 + BD, yd = Y0 + ND;
+  const REC = 1.0, wy = Y0 + REC, PW = NW - 0.3;     // Vasaku süvise sügavus, tagaseina tasapind ja süvise parempoolne post.
+  const PT = 0.14;                                    // Rõduparapeti paksus fassaaditasapinnast.
 
   // Põhimaht, rõdude tagasein ja nurgapostid.
   B.add('h1Plaat', plaanikast(X0, X1, yb, Y1, 0, TOP, { faces: 'NEW', gb }));
   B.add('h1Tume', plaanikast(BX0, BX1, yb, yb + 0.1, GF, TOP, { faces: 'S', gb }));
   for (const [a, b] of [[X0, BX0], [BX1, X1]]) B.add('h1Post', plaanikast(a, b, Y0 - 0.06, yb, 0, TOP + 0.9, { faces: 'SEWT', gb }));
 
-  // Esimene korrus: vasakul sildiga sein, paremal läbipääs.
-  B.add('h1Plaat', plaanikast(BX0, NW, Y0 + 0.25, Y0 + 1.6, 0, GF, { faces: 'SE', gb }));      // Sildiga sein ja lääneseina algus.
+  // Esimene korrus: vasakul 1 m sügavune süvis sildiga tagaseina ja postiga, paremal läbipääs.
+  // Süvise lagi on esimese rõdu alapind, külgedeks nurgapost ja süvise post.
+  B.add('h1Plaat', plaanikast(BX0, NW, wy, Y0 + 1.6, 0, GF, { faces: 'SE', gb }));            // Süvise tagasein ja läbipääsu lääneseina algus.
+  B.add('h1Plaat', plaanikast(PW, NW, Y0, wy, 0, GF, { faces: 'SEW', gb }));                 // Süvise ja läbipääsu vaheline post.
   B.add('betoon', plaanikast(BX0, NW, Y0 + 1.6, yd, 0, GF, { faces: 'E' }));                 // Läbipääsu betoonist läänesein.
-  B.add('betoon', plaanikast(NE, NE + 0.3, Y0 + 0.3, yd, 0, NH, { faces: 'W' }));             // Läbipääsu pargipoolne betoonsein.
+  B.add('betoon', plaanikast(NE, NE + 0.3, yb, yd, 0, NH, { faces: 'W' }));                  // Läbipääsu pargipoolne betoonsein algab nurgaposti tagant.
   B.add('tumeBetoon', plaanikast(NW, NE, yd, yd + 0.2, 0, NH, { faces: 'S' }));              // Läbipääsu tagasein.
   B.add('vore', fassaadinelinurk('S', yd - 0.02, (NW + NE) / 2, NE - NW - 0.3, 0.05, 2.3, [0, 0, NE - NW - 0.3, 2.3]));   // Värav hoovi.
   B.add('tumeMetall', plaanikast(NW + 0.1, NE - 0.1, yd - 0.08, yd - 0.02, 2.3, 2.4, { faces: 'NSEWTB' }));
@@ -75,20 +79,21 @@ export function looH1(B, ctx) {
   // Esiväljak: madal graniitserv kõnnitee ääres, lai ava läbipääsu ja seina ees.
   const fy = ctx.h1Fore ? ctx.h1Fore[0][1] : Y0 - 4.6;
   for (const [a, b] of [[-24.55, -23.9], [-15.9, -15.85]]) B.add('graniit', plaanikast(a, b, fy - 0.02, fy + 0.18, 0, 0.12, { faces: 'NSEWT' }));
-  B.add('graniit', plaanikast(-24.55, -24.4, fy, Y0 - 0.06, 0, 0.12, { faces: 'NSEWT' }));
-  B.add('h1Sokkel', plaanikast(-24.55, -24.4, fy, Y0 - 0.06, 0.12, 0.13, { faces: 'T' }));
+  B.add('graniit', plaanikast(-24.55, -24.4, fy + 0.18, Y0 - 0.06, 0, 0.12, { faces: 'NSEWT' }));
+  B.add('h1Sokkel', plaanikast(-24.55, -24.4, fy + 0.18, Y0 - 0.06, 0.12, 0.13, { faces: 'T' }));
   col.box(-24.6, -24.4, fy, Y0, 0.12, 'curb');
 
-  // Kaheosalised rõdud.
+  // Kaheosalised rõdud. Plaat, parapet ja vahesein on suletud mahud: parapetil on alapind,
+  // plaadi alapind algab parapeti tagant ja vahesein seisab parapeti taga, et esipinnad ei kattuks.
   const secs = [[BX0, XD - 0.12], [XD + 0.12, BX1]];
   for (let k = 0; k < NF; k++) {
     const f = GF + k * FH;
     B.add('tumeBetoon', plaanikast(BX0, BX1, Y0, yb, f - 0.18, f, { faces: 'T' }));
-    B.add('soffit', plaanikast(BX0, BX1, Y0, yb, f - 0.18, f - 0.18, { faces: 'B' }));
-    B.add('h1Plaat', plaanikast(BX0, BX1, Y0 - 0.03, Y0 + 0.14, f - 0.18, f + 0.9, { faces: 'SNT', gb }));
+    B.add('soffit', plaanikast(BX0, BX1, Y0 + PT, yb, f - 0.18, f - 0.18, { faces: 'B' }));
+    B.add('h1Plaat', plaanikast(BX0, BX1, Y0 - 0.03, Y0 + PT, f - 0.18, f + 0.9, { faces: 'SNTB', gb }));
     B.add('hallMetall', plaanikast(BX0, BX1, Y0 + 0.02, Y0 + 0.08, f + 1.04, f + 1.08, { faces: 'NSTB' }));
     for (let x = BX0 + 0.55; x < BX1 - 0.3; x += 1.15) B.add('hallMetall', plaanikast(x - 0.015, x + 0.015, Y0 + 0.035, Y0 + 0.065, f + 0.9, f + 1.04, { faces: 'NSEW' }));
-    B.add('valge', plaanikast(XD - 0.12, XD + 0.12, Y0 - 0.03, yb, f, f + FH - 0.18, { faces: 'SEW' }));
+    B.add('valge', plaanikast(XD - 0.12, XD + 0.12, Y0 + PT, yb, f, f + FH - 0.18, { faces: 'SEW' }));
     for (const [a, b] of secs) {
       const c = (a + b) / 2;
       win(B, R, 'S', yb, c - 0.55, 1.75, f + 0.05, f + 2.15, { aknaplekk: false, lit: 0.28 });
@@ -96,11 +101,10 @@ export function looH1(B, ctx) {
       if (R() < 0.45) ac(B, 'S', yb, c + 1.12, f + 0.02);
     }
   }
-  // Pööning, katus, tehnoruum ja mahuti.
-  B.add('h1Plaat', plaanikast(BX0, BX1, Y0 - 0.03, yb, TOP - 0.18, TOP + 0.9, { faces: 'ST', gb }));
-  B.add('soffit', plaanikast(BX0, BX1, Y0, yb, TOP - 0.18, TOP - 0.18, { faces: 'B' }));
+  // Pööning, katus, tehnoruum ja mahuti. Pööninguparapeti alapind katab kogu rõdusügavuse.
+  B.add('h1Plaat', plaanikast(BX0, BX1, Y0 - 0.03, yb, TOP - 0.18, TOP + 0.9, { faces: 'STB', gb }));
   B.add('tumeBetoon', plaanikast(X0, X1, Y0, Y1, TOP, TOP + 0.02, { faces: 'T' }));
-  for (const b of [[X0, X1, Y1 - 0.2, Y1], [X0, X0 + 0.2, yb, Y1], [X1 - 0.2, X1, yb, Y1]]) {
+  for (const b of [[X0, X1, Y1 - 0.2, Y1], [X0, X0 + 0.2, yb, Y1 - 0.2], [X1 - 0.2, X1, yb, Y1 - 0.2]]) {   // Külgparapetid lõpevad põhjaparapeti ees.
     B.add('h1Plaat', plaanikast(b[0], b[1], b[2], b[3], TOP, TOP + 0.9, { faces: 'NSEWT', gb }));
   }
   B.add('h1Plaat', plaanikast(-21.6, -18.4, Y1 - 5.4, Y1 - 1.0, TOP, TOP + 2.7, { faces: 'NSEWT', gb }));
@@ -121,15 +125,14 @@ export function looH1(B, ctx) {
   B.add('hallMetall', cyl(X1 + 0.08, yb + 0.3, 0, 0.05, 0.05, TOP + 0.6, 6));
   B.add('hallMetall', cyl(X0 - 0.08, yb + 0.25, 0, 0.05, 0.05, TOP + 0.6, 6));
 
-  // Nimesilt, seinavalgusti ja lillepeenar seina ees.
-  const wy = Y0 + 0.25;
+  // Nimesilt ja seinavalgusti süvise tagaseinal, lillepeenar süvise ees fassaadijoonest väljas.
   B.add('tumeMetall', fassaadikast('S', wy, -23.05, -21.25, 1.28, 1.92, 0, 0.025));
   B.add('nimesilt', fassaadinelinurk('S', wy - 0.03, -22.15, 1.7, 1.32, 1.88));
-  B.add('lambiKlaas', fassaadikast('S', wy, NW - 0.5, NW - 0.24, 2.05, 2.4, 0, 0.09));
-  B.add('tumeGraniit', plaanikast(-23.8, -20.45, Y0 - 1.2, Y0 + 0.2, 0, 0.45, { faces: 'NSEWT' }));
-  hekirida(B, -23.7, -20.55, Y0 - 1.1, Y0 + 0.1, 0.95, 31);
-  col.box(-23.8, -20.45, Y0 - 1.2, wy, 0.9, 'planter');
-  light(ctx, NW - 0.37, wy - 0.4, 2.2, 0xffc890, 2.5, 4.5);
+  B.add('lambiKlaas', fassaadikast('S', wy, PW - 0.62, PW - 0.36, 2.05, 2.4, 0, 0.09));
+  B.add('tumeGraniit', plaanikast(-23.8, -20.9, Y0 - 1.5, Y0 - 0.2, 0, 0.45, { faces: 'NSEWT' }));
+  hekirida(B, -23.7, -21.0, Y0 - 1.4, Y0 - 0.3, 0.95, 31);
+  col.box(-23.8, -20.9, Y0 - 1.5, Y0 - 0.2, 0.9, 'planter');
+  light(ctx, PW - 0.49, wy - 0.4, 2.2, 0xffc890, 2.5, 4.5);
 
   // Läbipääsu alguses postkastid ja fonolukk, küljel klaasuks trepikotta, laes valgustid.
   B.add('hallMetall', fassaadikast('E', NW, Y0 + 1.9, Y0 + 3.7, 0.85, 1.75, 0, 0.32));
@@ -139,8 +142,8 @@ export function looH1(B, ctx) {
   B.add('tumeMetall', fassaadikast('W', NE, Y0 + 4.2, Y0 + 4.45, 1.15, 1.5, 0, 0.04));
   const dy0 = Y0 + 5.2, dy1 = Y0 + 7.0;
   B.add('fuajee', fassaadinelinurk('E', NW + 0.015, (dy0 + dy1) / 2, dy1 - dy0, 0.07, 2.3));
-  B.add('tumeMetall', fassaadikast('E', NW, dy0 - 0.06, dy0, 0.07, 2.4, 0, 0.08));
-  B.add('tumeMetall', fassaadikast('E', NW, dy1, dy1 + 0.06, 0.07, 2.4, 0, 0.08));
+  B.add('tumeMetall', fassaadikast('E', NW, dy0 - 0.06, dy0, 0.07, 2.3, 0, 0.08));
+  B.add('tumeMetall', fassaadikast('E', NW, dy1, dy1 + 0.06, 0.07, 2.3, 0, 0.08));
   B.add('tumeMetall', fassaadikast('E', NW, dy0 - 0.06, dy1 + 0.06, 2.3, 2.4, 0, 0.08));
   for (const y of [Y0 + 2.2, Y0 + 6.0, Y0 + 9.8]) {
     B.add('lambiKlaas', cyl((NW + NE) / 2, y, NH - 0.05, 0.2, 0.2, 0.04, 14));
@@ -156,9 +159,10 @@ export function looH1(B, ctx) {
   }
   col.seg([FX, FY0], [FX, FY1], 0.1, 2.0, 'slabFence');
 
-  // Kokkupõrkekehad ja kaamera laepiirangud.
+  // Kokkupõrkekehad ja kaamera laepiirangud: süvise tagasein, nurgapostid, süvise post ja läbipääsu seinad.
   col.box(X0, NW, wy, Y1, TOP, 'H1');
   col.box(X0, BX0, Y0 - 0.06, Y1, TOP, 'H1');
+  col.box(PW, NW, Y0, wy, TOP, 'H1');
   col.box(NE, X1, Y0 - 0.06, Y1, TOP, 'H1');
   col.box(NW, NE, yd, Y1, TOP, 'H1');
   ctx.laed.push([NW, NE, Y0 + 0.3, yd, NH], [BX0, BX1, Y0, yb, GF - 0.18]);
@@ -190,39 +194,64 @@ export function looH2(B, ctx) {
   const BAL = 1.3, by = BAL;        // Rõdu sügavus fassaaditasapinnast.
   const X0 = 0, X1 = L, Y0 = -D, Y1 = 0;
 
-  // Esimene korrus ja ülemine maht samast heledast betoonist.
-  F.add('h2Sein', plaanikast(X0, X1, Y0, gy, 0, GF, { faces: 'NSEW', gb }));
-  F.add('h2Sein', plaanikast(X0, X1, Y0, Y1, GF, TOP, { faces: 'NSEW', gb }));
-  F.add('soffit', plaanikast(X0, X1, gy, by, GF - 0.25, GF - 0.25, { faces: 'B' }));
+  // Tänavafassaad astub plaanis sügavusse: kaks rõdudega eenduvat osa (y = 0), nende vahel kitsas
+  // tagasiastuv vahe ja ristmikupoolses otsas tagasiastuv trepikojaosa. Astmed on hoone kehas,
+  // külgpinnad ühendavad eri sügavusel olevad fassaadiosad. Esimene korrus jääb läbivalt tasapinnale gy.
+  const BAYS = [
+    { x0: 0, x1: 7.2, y: 0, rodud: true, units: [[0, 3.6], [3.6, 7.2]], part: [3.6], sides: 'W' },
+    { x0: 7.2, x1: 9.0, y: -1.4, rodud: false, sides: '' },
+    { x0: 9.0, x1: 19.8, y: 0, rodud: true, units: [[9.0, 12.6], [12.6, 16.2], [16.2, 19.8]], part: [12.6, 16.2], sides: '' },
+    { x0: 19.8, x1: L, y: -1.1, rodud: false, sides: 'E' },
+  ];
+  const yEast = BAYS[BAYS.length - 1].y;
 
-  // Rõdud klaaspiirete ja mattide vaheseintega.
-  const units = [[0, 3.6], [3.6, 7.2], [8.0, 11.0], [11.0, 13.5], [14.4, 18.2], [18.2, 22.0]];
-  const PYL = [7.6, 13.95], PART = [3.6, 11.0, 18.2];
+  // Esimene korrus ja ülemine maht samast heledast betoonist; ülemine maht fassaadiosade kaupa.
+  // Astmete külgpinnad on rõduribade otsaseinad; hoone otsaseinad lisatakse ainult otsmistele osadele
+  // ja otsaseinte taha jäävas osas, et pinnad ei kattuks.
+  F.add('h2Sein', plaanikast(X0, X1, Y0, gy, 0, GF, { faces: 'NSEW', gb }));
+  for (const b of BAYS) {
+    F.add('h2Sein', plaanikast(b.x0, b.x1, Y0, b.y, GF, TOP, { faces: 'NS', gb }));
+    for (const s of b.sides) F.add('h2Sein', plaanikast(b.x0, b.x1, Y0, b.rodud ? gy : b.y, GF, TOP, { faces: s, gb }));
+    F.add('soffit', plaanikast(b.x0, b.x1, gy, b.rodud ? by : b.y, GF - 0.25, GF - 0.25, { faces: 'B' }));
+  }
+
+  // Rõdud klaaspiirete ja mattide vaheseintega eenduvatel osadel; tagasiastuvatel osadel kitsad aknad.
   for (let k = 0; k < NF; k++) {
     const f = GF + k * FH;
-    F.add('h2Plaat', plaanikast(X0 + 0.25, X1 - 0.25, Y1, by, f - 0.25, f, { faces: 'NEWT' }));
-    if (k > 0) F.add('soffit', plaanikast(X0 + 0.25, X1 - 0.25, Y1, by, f - 0.25, f, { faces: 'B' }));
-    F.add('klaaspiire', plaanikast(X0 + 0.25, X1 - 0.25, by - 0.09, by - 0.04, f, f + 1.1, { faces: 'NSEWT', vBase: f }));
-    F.add('hallMetall', plaanikast(X0 + 0.25, X1 - 0.25, by - 0.1, by - 0.03, f + 1.1, f + 1.15, { faces: 'NST' }));
-    for (const x of PART) F.add('klaaspiire', plaanikast(x - 0.03, x + 0.03, Y1, by - 0.1, f, f + 2.45, { faces: 'EW', vBase: f }));
-    for (const [a, b] of units) {
-      const c = (a + b) / 2, w = Math.min(1.5, (b - a) / 2 - 0.35);
-      win(F, R, 'N', Y1, c - w / 2 - 0.2, w, f + 0.05, f + 2.15, { aknaplekk: false, lit: 0.22 });
-      win(F, R, 'N', Y1, c + w / 2 + 0.2, w, f + 0.05, f + 2.15, { aknaplekk: false, lit: 0.22 });
-      if (R() < 0.5) ac(F, 'N', Y1, b - 0.75, f);
+    for (const b of BAYS) {
+      if (!b.rodud) {
+        const c = (b.x0 + b.x1) / 2, w = Math.min(1.2, b.x1 - b.x0 - 0.9);
+        win(F, R, 'N', b.y, c, w, f + 0.9, f + 2.05, { lit: 0.2, aknaplekiMaterjal: 'h2Plaat' });
+        continue;
+      }
+      const a0 = b.x0 + 0.25, a1 = b.x1 - 0.25;
+      F.add('h2Plaat', plaanikast(a0, a1, Y1, by, f - 0.25, f, { faces: 'NEWT' }));
+      if (k > 0) F.add('soffit', plaanikast(a0, a1, Y1, by, f - 0.25, f, { faces: 'B' }));
+      F.add('klaaspiire', plaanikast(a0, a1, by - 0.09, by - 0.04, f, f + 1.1, { faces: 'NSEWT', vBase: f }));
+      F.add('hallMetall', plaanikast(a0, a1, by - 0.1, by - 0.03, f + 1.1, f + 1.15, { faces: 'NST' }));
+      for (const x of b.part) F.add('klaaspiire', plaanikast(x - 0.03, x + 0.03, Y1, by - 0.1, f, f + 2.45, { faces: 'EW', vBase: f }));
+      for (const [a, c1] of b.units) {
+        const c = (a + c1) / 2, w = Math.min(1.5, (c1 - a) / 2 - 0.35);
+        win(F, R, 'N', Y1, c - w / 2 - 0.2, w, f + 0.05, f + 2.15, { aknaplekk: false, lit: 0.22 });
+        win(F, R, 'N', Y1, c + w / 2 + 0.2, w, f + 0.05, f + 2.15, { aknaplekk: false, lit: 0.22 });
+        if (R() < 0.5) ac(F, 'N', Y1, c1 - 0.75, f);
+      }
     }
   }
-  // Täiskõrguses postid ja rõduriba otsaseinad.
-  for (const x of PYL) F.add('h2Sein', plaanikast(x - 0.45, x + 0.45, gy, by + 0.25, 0, TOP + 0.6, { faces: 'NEWT', gb }));
-  F.add('h2Sein', plaanikast(X0, X0 + 0.25, gy, by + 0.05, 0, TOP + 0.3, { faces: 'NEWT', gb }));
-  F.add('h2Sein', plaanikast(X1 - 0.25, X1, gy, by + 0.05, 0, TOP + 0.3, { faces: 'NEWT', gb }));
-  F.add('h2Plaat', plaanikast(X0, X1, gy, by + 0.05, TOP - 0.1, TOP + 0.35, { faces: 'NEWTB' }));
+  // Rõduribade otsaseinad täiskõrguses igal eenduval osal ning ribade pealmine plaat otsaseinte vahel.
+  const CAP = TOP + 0.35;
+  for (const b of BAYS) {
+    if (!b.rodud) continue;
+    F.add('h2Sein', plaanikast(b.x0, b.x0 + 0.25, gy, by + 0.05, 0, CAP, { faces: 'NEWT', gb }));
+    F.add('h2Sein', plaanikast(b.x1 - 0.25, b.x1, gy, by + 0.05, 0, CAP, { faces: 'NEWT', gb }));
+    F.add('h2Plaat', plaanikast(b.x0 + 0.25, b.x1 - 0.25, gy, by + 0.05, TOP - 0.1, CAP, { faces: 'NSTB' }));
+  }
 
   // Esimesel korrusel läänes varikatusega fuajee, teenindusaken ja idas võre taga parkla.
   const LOB = [3.6, 7.0];
   F.add('fuajee', fassaadinelinurk('N', gy + 0.015, (LOB[0] + LOB[1]) / 2, LOB[1] - LOB[0] - 0.2, 0.05, 2.8));
-  F.add('tumeMetall', fassaadikast('N', gy, LOB[0] - 0.1, LOB[0], 0.05, 2.9, 0, 0.1));
-  F.add('tumeMetall', fassaadikast('N', gy, LOB[1], LOB[1] + 0.1, 0.05, 2.9, 0, 0.1));
+  F.add('tumeMetall', fassaadikast('N', gy, LOB[0] - 0.1, LOB[0], 0.05, 2.8, 0, 0.1));
+  F.add('tumeMetall', fassaadikast('N', gy, LOB[1], LOB[1] + 0.1, 0.05, 2.8, 0, 0.1));
   F.add('tumeMetall', fassaadikast('N', gy, LOB[0] - 0.1, LOB[1] + 0.1, 2.8, 2.9, 0, 0.1));
   F.add('h2Plaat', plaanikast(LOB[0] - 0.3, LOB[1] + 0.3, gy, gy + 1.7, 2.95, 3.1, { faces: 'NSEWTB' }));
   const GR = [[14.5, 17.9], [18.0, 21.4]];
@@ -234,15 +263,16 @@ export function looH2(B, ctx) {
   win(F, R, 'N', gy, 11.6, 1.4, 1.0, 2.1, { cell: 7, aknaplekiMaterjal: 'h2Plaat' });
   F.add('hallMetall', fassaadikast('N', gy, 12.6, 13.4, 0.9, 1.8, 0, 0.14));
 
-  // Idaots J/E1 poole: nurgarõdud, aknad ja kliimaseadmed.
-  const ey0 = Y1 - 4.4;
+  // Idaots J/E1 poole: nurgarõdud tagasiastuva otsaosa fassaadijooneni, aknad ja kliimaseadmed.
+  const ey0 = Y1 - 4.4, ey1 = yEast;
   for (let k = 0; k < NF; k++) {
     const f = GF + k * FH;
-    F.add('h2Plaat', plaanikast(X1, X1 + 1.2, ey0, Y1, f - 0.25, f, { faces: 'NSET' }));
-    if (k > 0) F.add('soffit', plaanikast(X1, X1 + 1.2, ey0, Y1, f - 0.25, f, { faces: 'B' }));
-    F.add('klaaspiire', plaanikast(X1 + 1.11, X1 + 1.16, ey0, Y1, f, f + 1.1, { faces: 'NSEWT', vBase: f }));
+    F.add('h2Plaat', plaanikast(X1, X1 + 1.2, ey0, ey1, f - 0.25, f, { faces: 'NSET' }));
+    if (k > 0) F.add('soffit', plaanikast(X1, X1 + 1.2, ey0, ey1, f - 0.25, f, { faces: 'B' }));
+    F.add('klaaspiire', plaanikast(X1 + 1.11, X1 + 1.16, ey0, ey1, f, f + 1.1, { faces: 'NSEWT', vBase: f }));
     F.add('klaaspiire', plaanikast(X1, X1 + 1.16, ey0 - 0.05, ey0, f, f + 1.1, { faces: 'NSEWT', vBase: f }));
-    win(F, R, 'E', X1, Y1 - 2.2, 1.6, f + 0.05, f + 2.15, { aknaplekk: false, lit: 0.25 });
+    F.add('klaaspiire', plaanikast(X1, X1 + 1.16, ey1, ey1 + 0.05, f, f + 1.1, { faces: 'NSEWT', vBase: f }));
+    win(F, R, 'E', X1, (ey0 + ey1) / 2, 1.6, f + 0.05, f + 2.15, { aknaplekk: false, lit: 0.25 });
     if (R() < 0.8) win(F, R, 'E', X1, -6.5, 1.1, f + 0.9, f + 2.0, { lit: 0.2, aknaplekiMaterjal: 'h2Plaat' });
     if (R() < 0.7) win(F, R, 'E', X1, -9.7, 1.1, f + 0.9, f + 2.0, { lit: 0.2, aknaplekiMaterjal: 'h2Plaat' });
     if (R() < 0.5) ac(F, 'E', X1, -8.1, f + 0.1);
@@ -258,10 +288,24 @@ export function looH2(B, ctx) {
     for (let x = 1.5; x < X1 - 1; x += 3.6) if (R() < 0.8) win(F, R, 'S', Y0, x, 1.4, f + 0.9, f + 2.05, { lit: 0.2, aknaplekiMaterjal: 'h2Plaat' });
   }
 
-  // Katus.
-  F.add('tumeBetoon', plaanikast(X0, X1, Y0, Y1, TOP, TOP + 0.02, { faces: 'T' }));
-  for (const b of [[X0, X1, Y0, Y0 + 0.2], [X0, X1, Y1 - 0.2, Y1], [X0, X0 + 0.2, Y0, Y1], [X1 - 0.2, X1, Y0, Y1]]) {
-    F.add('h2Sein', plaanikast(b[0], b[1], b[2], b[3], TOP, TOP + 1.1, { faces: 'NSEWT', gb }));
+  // Katus: plaat ja parapet järgivad fassaadiosade astmeid. Parapetitükid ei kattu: külgparapetid on
+  // täispikad, esi- ja tagaparapet lõpevad nende ees; eenduvatel osadel seisab parapet rõduriba plaadil
+  // otsaseinte vahel ning astmete tagasipöörded otsaseintel.
+  for (const b of BAYS) F.add('tumeBetoon', plaanikast(b.x0, b.x1, Y0, b.y, TOP, TOP + 0.02, { faces: 'T' }));
+  const parapet = [[X0 + 0.2, X1 - 0.2, Y0, Y0 + 0.2, TOP], [X0, X0 + 0.2, Y0, gy, TOP], [X0, X0 + 0.25, gy, BAYS[0].y, CAP],
+    [X1 - 0.2, X1, Y0, yEast, TOP]];
+  BAYS.forEach((b, i) => {
+    const x0 = b.rodud ? b.x0 + 0.25 : i === 0 ? b.x0 + 0.2 : b.x0;
+    const x1 = b.rodud ? b.x1 - 0.25 : i === BAYS.length - 1 ? b.x1 - 0.2 : b.x1;
+    parapet.push([x0, x1, b.y - 0.2, b.y, b.rodud ? CAP : TOP]);
+  });
+  for (let i = 1; i < BAYS.length; i++) {
+    const a = BAYS[i - 1], b = BAYS[i], lo = Math.min(a.y, b.y), hi = Math.max(a.y, b.y);
+    if (hi - lo < 0.01) continue;
+    parapet.push(a.y > b.y ? [a.x1 - 0.25, a.x1, lo, hi, a.rodud ? CAP : TOP] : [b.x0, b.x0 + 0.25, lo, hi, b.rodud ? CAP : TOP]);
+  }
+  for (const b of parapet) {
+    F.add('h2Sein', plaanikast(b[0], b[1], b[2], b[3], b[4], TOP + 1.1, { faces: 'NSEWT', gb }));
   }
   F.add('h2Sein', plaanikast(15.5, 19.5, -9.5, -5.0, TOP, TOP + 3.0, { faces: 'NSEWT', gb }));
   F.add('hallMetall', cyl(4.0, -7.0, TOP, 1.0, 1.0, 1.8, 12));
@@ -270,9 +314,11 @@ export function looH2(B, ctx) {
   // Plaanil pööratud kokkupõrkekastid ja kaamera laepiirangud.
   const ob = (x0, x1, y0, y1, h, tag) => { const c = F.plaanile((x0 + x1) / 2, (y0 + y1) / 2); col.obox(c[0], c[1], (x1 - x0) / 2, (y1 - y0) / 2, ang, h, tag); };
   ob(X0, X1, Y0, gy, TOP, 'H2');
-  for (const x of PYL) ob(x - 0.45, x + 0.45, gy, by + 0.25, TOP, 'H2');
-  ob(X0, X0 + 0.25, gy, by + 0.05, TOP, 'H2');
-  ob(X1 - 0.25, X1, gy, by + 0.05, TOP, 'H2');
+  for (const b of BAYS) {
+    if (!b.rodud) continue;
+    ob(b.x0, b.x0 + 0.25, gy, by + 0.05, TOP, 'H2');
+    ob(b.x1 - 0.25, b.x1, gy, by + 0.05, TOP, 'H2');
+  }
   ob(14.3, 21.6, gy, gy + 0.32, 2.4, 'vore');
   const ceil = (x0, x1, y0, y1, h) => {
     const n = Math.max(1, Math.ceil((x1 - x0) / 4));
@@ -284,7 +330,7 @@ export function looH2(B, ctx) {
   };
   ceil(X0, X1, gy, by + 0.05, GF - 0.25);
   ceil(LOB[0] - 0.3, LOB[1] + 0.3, gy, gy + 1.7, 2.95);
-  ctx.h2 = { F, L, D, ang, gy, by, TOP, drive: [14.5, 21.4], fuajee: LOB, pylons: PYL,
+  ctx.h2 = { F, L, D, ang, gy, by, TOP, drive: [14.5, 21.4], fuajee: LOB, bays: BAYS,
     poly: [F.plaanile(0, -D), F.plaanile(L, -D), F.plaanile(L, gy), F.plaanile(0, gy)], origin: F.plaanile(0, 0), edgeY: null };   // Esimese korruse seinte piirjoon kontrollideks; rõdudealune arkaad on avatud.
   looH2Esiväljak(B, ctx, R);
 }
@@ -377,8 +423,8 @@ function looAutomaadid(B, ctx, F, gy) {
   for (const v of AUTOMAADID) {
     const { x: X, kind } = v;
     F.add('tumeMetall', plaanikast(X - w / 2 - 0.01, X + w / 2 + 0.01, ya - 0.01, yz + 0.01, 0.05, 0.13, { faces: 'NSEWT' }));
-    // Suletud korpus: küljed, tagasein, oma servaga kaas (h → h + 0,015) ja põhi.
-    F.add('automaadiKulg' + kind, plaanikast(X - w / 2, X + w / 2, ya, yz, 0.13, h + 0.015, { faces: 'NSEWTB' }));
+    // Suletud korpus: küljed, tagasein ja põhi kaane alumise servani; oma servaga kaas (h − 0,035 → h + 0,015).
+    F.add('automaadiKulg' + kind, plaanikast(X - w / 2, X + w / 2, ya, yz, 0.13, h - 0.035, { faces: 'NSEWTB' }));
     F.add('automaadiKulg' + kind, plaanikast(X - w / 2 - 0.012, X + w / 2 + 0.012, ya - 0.012, yz + 0.012, h - 0.035, h + 0.015, { faces: 'NSEWTB' }));
     // Taastamisel säilis generaator; atlase vastendus ja väljastusava geomeetria
     // rekonstrueeriti atlase mõõtmete ja automaadi kuvatõmmise järgi.
@@ -386,10 +432,10 @@ function looAutomaadid(B, ctx, F, gy) {
     const sideUV = [2 / 3 + kind / 6, 0, 2 / 3 + (kind + 1) / 6, 1];
     F.add('automaadid', fassaadinelinurk('E', X + w / 2 + 0.002, (ya + yz) / 2, d, 0.13, h, sideUV));
     F.add('automaadid', fassaadinelinurk('W', X - w / 2 - 0.002, (ya + yz) / 2, d, 0.13, h, sideUV));
-    // Esipaneeli eenduv suletud raam ja väljastusalus.
-    F.add('automaadiKulg' + kind, plaanikast(X - w / 2, X - w / 2 + 0.04, yz, yz + 0.05, 0.13, h, { faces: 'NSEWTB' }));
-    F.add('automaadiKulg' + kind, plaanikast(X + w / 2 - 0.04, X + w / 2, yz, yz + 0.05, 0.13, h, { faces: 'NSEWTB' }));
-    F.add('automaadiKulg' + kind, plaanikast(X - w / 2, X + w / 2, yz, yz + 0.05, h - 0.05, h + 0.015, { faces: 'NSEWTB' }));
+    // Esipaneeli eenduv suletud raam (külgliistud ülemise liistu alla) ja väljastusalus.
+    F.add('automaadiKulg' + kind, plaanikast(X - w / 2, X - w / 2 + 0.04, yz, yz + 0.05, 0.13, h - 0.05, { faces: 'NSEWTB' }));
+    F.add('automaadiKulg' + kind, plaanikast(X + w / 2 - 0.04, X + w / 2, yz, yz + 0.05, 0.13, h - 0.05, { faces: 'NSEWTB' }));
+    F.add('automaadiKulg' + kind, plaanikast(X - w / 2, X + w / 2, yz + 0.012, yz + 0.05, h - 0.05, h + 0.015, { faces: 'NSEWTB' }));   // Ülemine liist algab kaane esiservast.
     // Pikslid vastavad avausele x=70..340, y=706..814 igal 512×872 esipaneelil.
     const slotL = X + w / 2 - 340 / 512 * w, slotR = X + w / 2 - 70 / 512 * w;
     const slotTop = h - 706 / 872 * (h - 0.13), slotBottom = h - 814 / 872 * (h - 0.13);
@@ -417,11 +463,21 @@ function mustAed(B, ctx, pts) {
     const a0 = alongX ? Math.min(ax, bx) : Math.min(ay, by), a1 = alongX ? Math.max(ax, bx) : Math.max(ay, by);
     const pl = alongX ? ay : ax, L = a1 - a0;
     const box = (u0, u1, w, h0, h1) => (alongX ? plaanikast(u0, u1, pl - w, pl + w, h0, h1, { faces: 'NSEWT' }) : plaanikast(pl - w, pl + w, u0, u1, h0, h1, { faces: 'NSEWT' }));
-    B.add('betoon', box(a0 - 0.09, a1 + 0.09, 0.09, 0, 0.3));
+    // Sokkel ulatub lõigu lõpus üle nurga; järgmine lõik algab nurgasokli tagant, et pinnad ei kattuks.
+    const algus = i === 0, kasvav = alongX ? ax < bx : ay < by;
+    const e0 = kasvav ? (algus ? 0.09 : -0.09) : 0.09;
+    const e1 = kasvav ? 0.09 : (algus ? 0.09 : -0.09);
+    B.add('betoon', box(a0 - e0, a1 + e1, 0.09, 0, 0.3));
     B.add('vore', fassaadinelinurk(alongX ? 'S' : 'E', pl, (a0 + a1) / 2, L, 0.3, 1.15, [0, 0, L, 0.85]));
-    B.add('mustMetall', box(a0, a1, 0.03, 1.13, 1.19));
+    B.add('mustMetall', box(a0 + 0.03, a1 - 0.03, 0.03, 1.13, 1.19));
     const n = Math.max(1, Math.round(L / 1.2));
-    for (let k = 0; k <= n; k++) { const a = a0 + (L * k) / n; B.add('mustMetall', box(a - 0.035, a + 0.035, 0.035, 0.3, 1.21)); }
+    // Nurgapost lisatakse vaid üks kord: lõigu alguspost jääb ära, kui eelmine lõik lõppes samas punktis.
+    for (let k = 0; k <= n; k++) {
+      const a = a0 + (L * k) / n;
+      const nurk = (alongX ? ax < bx : ay < by) ? k === 0 : k === n;
+      if (i > 0 && nurk) continue;
+      B.add('mustMetall', box(a - 0.035, a + 0.035, 0.035, 0.3, 1.21));
+    }
     ctx.col.seg(pts[i], pts[i + 1], 0.1, 1.2, 'fenceN1');
   }
 }
@@ -445,7 +501,7 @@ export function looN1(B, ctx) {
     for (const y of [12.5, 17.5]) if (R() < 0.6) win(B, R, 'W', X0, y, 1.0, f + 0.95, f + 2.0, { lit: 0.15, aknaplekiMaterjal: 'h1Serv' });
   }
   B.add('tumeBetoon', plaanikast(X0, X1, Y0, Y1, TOP, TOP + 0.02, { faces: 'T' }));
-  for (const b of [[X0, X1, Y0, Y0 + 0.2], [X0, X1, Y1 - 0.2, Y1], [X0, X0 + 0.2, Y0, Y1], [X1 - 0.2, X1, Y0, Y1]]) {
+  for (const b of [[X0, X1, Y0, Y0 + 0.2], [X0, X1, Y1 - 0.2, Y1], [X0, X0 + 0.2, Y0 + 0.2, Y1 - 0.2], [X1 - 0.2, X1, Y0 + 0.2, Y1 - 0.2]]) {
     B.add('n1Sein', plaanikast(b[0], b[1], b[2], b[3], TOP, TOP + 0.8, { faces: 'NSEWT', gb }));
   }
   B.add('hallMetall', cyl(-27.0, 18.5, TOP, 0.7, 0.7, 1.3, 12));
@@ -481,7 +537,7 @@ function looN3(B, ctx) {
     for (const y of [-2.5, -8.0]) if (R() < 0.75) win(F, R, 'W', 0, y, 1.0, f + 0.9, f + 2.0, { lit: 0.2, aknaplekiMaterjal: 'h2Plaat' });
   }
   F.add('tumeBetoon', plaanikast(0, L, -D, 0, TOP, TOP + 0.02, { faces: 'T' }));
-  for (const b of [[0, L, -0.2, 0], [0, L, -D, -D + 0.2], [0, 0.2, -D, 0], [L - 0.2, L, -D, 0]]) {
+  for (const b of [[0.2, L - 0.2, -0.2, 0], [0.2, L - 0.2, -D, -D + 0.2], [0, 0.2, -D, 0], [L - 0.2, L, -D, 0]]) {
     F.add('beezPlaat', plaanikast(b[0], b[1], b[2], b[3], TOP, TOP + 0.9, { faces: 'NSEWT', gb }));
   }
   F.add('hallMetall', cyl(L - 3.0, -6.0, TOP, 0.9, 0.9, 1.6, 12));

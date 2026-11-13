@@ -587,6 +587,29 @@ def looAiakivi():
     save(rgb, 'aiakivi.jpg')
 
 
+def looSokkelkivi():
+    """Aia sokli tahutud kiviplokkide esipinnad: neli 256 × 256 px ruutu eri tooniga.
+    Iga ruut on ühe ploki esikülg; krobeline pind, kerge reljeef ja tumedamad servad."""
+    r = juhu(25); S = 256; N = 4
+    out = np.zeros((S, S * N, 3), np.float32)
+    yy, xx = np.mgrid[0:S, 0:S].astype(np.float32)
+    toonid = [(0.76, 0.74, 0.69), (0.70, 0.69, 0.65), (0.80, 0.77, 0.70), (0.66, 0.66, 0.63)]
+    for k in range(N):
+        relief = fbm(S, S, 3, 3, r, 5, 0.55) - 0.5           # Tahumisjäljed, madal sagedus.
+        tera = (r.random((S, S)) - 0.5) * 0.09                 # Graniidi tera.
+        kriim = np.clip(fbm(S, S, 12, 2, r, 3) - 0.62, 0, 1) * 1.6   # Püstised meislijäljed.
+        gy, gx = np.gradient(relief)
+        vari = np.clip(0.5 + gx * 9.0 - gy * 6.0, 0.3, 1.3)    # Valgus vasakult ülalt.
+        v = 0.78 + relief * 0.35 + tera - kriim * 0.08
+        v = v * (0.75 + 0.25 * vari)
+        serv = np.minimum(np.minimum(xx, S - 1 - xx), np.minimum(yy, S - 1 - yy))
+        v *= 0.72 + 0.28 * np.clip(serv / 9.0, 0, 1)            # Ploki serva faas on tumedam.
+        v *= 1 - 0.22 * np.clip((yy / S - 0.75) / 0.25, 0, 1) * (0.5 + 0.5 * fbm(S, S, 6, 6, r, 3))   # Alaosa määrdunum.
+        t = np.array(toonid[k])
+        out[:, k * S:(k + 1) * S] = np.clip(v[..., None] * t[None, None, :] / 0.76, 0, 1)
+    save(out, 'sokkelkivi.jpg')
+
+
 def looPost():
     r = juhu(25); W, H = 64, 512
     yy, xx = np.mgrid[0:H, 0:W].astype(np.float32)
@@ -653,7 +676,7 @@ def main():
     tex_foliage_dense('tihedad_lehed.jpg', 19, (20, 28, 16), 0.85, 3200, 7, 13)
     tex_foliage_dense('hekk.jpg', 20, (26, 36, 18), 1.05, 4200, 4, 8)
     looMuru(); looMuld()
-    looKivimuur(); looAiakivi(); looPost(); looKaevuluuk(); looLiiklusmargid()
+    looKivimuur(); looAiakivi(); looSokkelkivi(); looPost(); looKaevuluuk(); looLiiklusmargid()
     print('Valmis.')
 
 

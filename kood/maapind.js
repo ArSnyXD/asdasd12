@@ -14,6 +14,15 @@ function nearX(pl, X) {
   return best;
 }
 
+// Pargi äärekivi telg: piki S–J tänava põhjaserva itta, viltu lõige kagunurgas ja sirge idaserv põhja.
+// Joone suund on lääne poolt itta ja edasi põhja, nii et tänav jääb paremale.
+function pargiAarekivi(mainW, hwM) {
+  const [lx, ly] = PARK.nurgaLoige, xc = PARK.X1 - lx;
+  const south = clip(nihutatudJoon(mainW, hwM + 0.9), (p) => p[0] > PARK.X0 && p[0] < xc);
+  const ys = south[south.length - 1][1];
+  return [...south, [xc, ys], [PARK.X1, ys + ly], [PARK.X1, PARK.Y1]];
+}
+
 export function looMaapind(B, ctx) {
   const mainFull = smooth(PLAAN.peatee.pts, 0.8);            // Edelast läbi S ja J kagusse.
   const sJ = project(mainFull, PLAAN.J).s;
@@ -61,9 +70,12 @@ export function looMaapind(B, ctx) {
 
   // Valge joon.
   const lw = 0.075;
-  const mN = clip(nihutatudJoon(mainW, hwM - 0.3), (p) => p[0] < -4.6);
-  const e2W = clip(nihutatudJoon(e2c, hwF - 0.25), (p) => p[1] > 4.6);
-  const north = uhendaNurk(mN, e2W, 12);                                   // Pargi nurk: tänav → E2.
+  const mN = clip(nihutatudJoon(mainW, hwM - 0.3), (p) => p[0] < PARK.X1 - PARK.nurgaLoige[0] - 0.3);
+  const e2W = clip(nihutatudJoon(e2c, hwF - 0.25), (p) => p[1] > PARK.Y1 + 1.2);
+  // Pargi nurk: joon kulgeb 0,3 m kõnniteeservast väljas piki pargi viltu lõiget ja sirget idaserva
+  // ning liitub pargist põhjas E2 servaga.
+  const pargiServ = nihutatudJoon(pargiAarekivi(mainW, hwM), -1.2).slice(-3);
+  const north = [...mN, ...pargiServ, ...e2W];
   const south = nihutatudJoon(mainVis, -(hwM - 0.3));                         // Katkematu lõunaserv S → J → E1.
   const fenceEdge = umarUhine(nihutatudJoon(e2c, -(hwF - 0.25)).reverse(),
     nihutatudJoon(jooneOsa(mainFull, sJ, sEnd), hwM - 0.3), PLAAN.aiaNurgaraadius + 1.5);   // Serv.
@@ -91,10 +103,12 @@ export function looMaapind(B, ctx) {
   B.add('betoon', taidaHulknurk(northLot, 0.05));
   B.add('betoon', taidaHulknurk(southLot, 0.05));
   B.add('betoon', taidaHulknurk(whiteLot, 0.05));
-  // H1 esiväljak: hele sillutis kõnniteest kitsa fassaadini, N1 aia ja pargimüüri vahel.
+  // H1 esiväljak: hele sillutis kõnniteest kitsa fassaadini, N1 aia ja pargimüüri vahel;
+  // sama sillutis jätkub esimese korruse vasaku süvise põranda alla.
   // Majaaluse läbipääsu graniitpõrand jätkab väljakut sügavusse.
   const yF = nearX(northEdge, -18.4)[1] + 0.02;
-  const fore = [[-24.55, yF], [-15.85, yF], [-15.85, H1.Y0 + 0.3], [-24.55, H1.Y0 + 0.3]];
+  const fore = [[-24.55, yF], [-15.85, yF], [-15.85, H1.Y0 + 0.3], [-20.45, H1.Y0 + 0.3], [-20.45, H1.Y0 + 1.0],
+    [-23.88, H1.Y0 + 1.0], [-23.88, H1.Y0 + 0.3], [-24.55, H1.Y0 + 0.3]];
   B.add('beezPlaat', taidaHulknurk(fore, 0.07));
   const h1Path = [[H1.PASS.X0, H1.Y0 - 0.3], [H1.PASS.X1, H1.Y0 - 0.3], [H1.PASS.X1, H1.Y0 + H1.PASS.depth], [H1.PASS.X0, H1.Y0 + H1.PASS.depth]];
   B.add('graniit', taidaHulknurk(h1Path, 0.075));
@@ -108,14 +122,12 @@ export function looMaapind(B, ctx) {
   const swE2 = clip(e2c, (p) => p[1] > PARK.Y1 + 0.2);
   B.add('tellis', ribbon(swE2, hwF, hwF + 1.0, 0.03, { swap: true }));
 
-  // Väikepark: plaadid 12 cm sõiduteest kõrgemal, graniitserv ja ümardatud nurk.
-  // Pikem külg kulgeb mööda E2 sügavusse; lühem külg avaneb S–J tänavale.
-  const pkS = clip(nihutatudJoon(mainW, hwM + 0.9), (p) => p[0] > PARK.X0 && p[0] < -4.4);
-  const pkE = clip(nihutatudJoon(e2c, hwF), (p) => p[1] > PARK.Y0 && p[1] < PARK.Y1);
-  const curb = uhendaNurk(pkS, pkE, 14);
+  // Väikepark: plaadid 12 cm sõiduteest kõrgemal, graniitserv, viltu lõigatud kagunurk ja sirge idaserv.
+  // Pikem külg kulgeb piki H1 külgseina E2 suunas; lühem külg avaneb S–J tänavale.
+  // Idaserva ja E2 sõidutee vahele jääv ala on asfalt (tee laiend), sest E2 ja aia asetust ei muudeta.
+  const curb = pargiAarekivi(mainW, hwM);
   ctx.parkCurb = curb;
-  const curbBrick = clip(curb, (p) => p[0] < -5.2);
-  B.add('tellis', ribbon(curbBrick, -0.9, 0, 0.03, { swap: true }));
+  B.add('tellis', ribbon(curb, -0.9, 0, 0.03, { swap: true }));
   B.add('graniit', ribbon(curb, 0, 0.24, 0.15));
   B.add('graniit', vwall(curb, 0, 0.15));
   const inner = nihutatudJoon(curb, 0.24);
@@ -124,7 +136,7 @@ export function looMaapind(B, ctx) {
   ctx.pargiHulknurk = pargiHulknurk;
   B.add('pargiplaat', taidaHulknurk(pargiHulknurk, 0.12));
   // Pargi põhjaserv: graniitäärekivi ja madal müür valge maja krundi poole.
-  B.add('graniit', plaanikast(PARK.X0, z[0], PARK.Y1, PARK.Y1 + 0.24, 0, 0.15, { faces: 'NSEWT' }));
+  B.add('graniit', plaanikast(PARK.X0, PARK.X1, PARK.Y1, PARK.Y1 + 0.24, 0, 0.15, { faces: 'NSEWT' }));
 
   // Aia taga kõrgendatud maapind suurte puude all; templihooneid post.
   const soilPoly = [...nihutatudJoon(aiaJoon, 0.25), [95, -70], [95, 56]];
@@ -139,7 +151,7 @@ export function looMaapind(B, ctx) {
   HG.fill(ribaHulknurk(mainVis, -(hwM + PLAAN.lounakonnitee), -hwM), 0.03);
   HG.fill(ribaHulknurk(aiaJoon, -1.55, -0.2), 0.03);
   HG.fill(ribaHulknurk(swE2, hwF, hwF + 1.0), 0.03);
-  HG.fill(ribaHulknurk(curbBrick, -0.9, 0), 0.03);
+  HG.fill(ribaHulknurk(curb, -0.9, 0), 0.03);
   HG.fill(pargiHulknurk, 0.12);
   HG.fill(ribaHulknurk(curb, 0, 0.24), 0.15);
   HG.fill(soilPoly, 0.62);

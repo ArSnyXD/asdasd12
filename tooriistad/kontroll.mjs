@@ -49,9 +49,35 @@ for (const kiirus of [0, 1.55, 3.3]) {
   for (let i = 0; i < 60; i++) tegelane.update(1 / 60, kiirus, kiirus > 2, 0);
   loenda(tegelane.root);
 }
+
+// Arhitektuuriparanduste proovipunktid: kattuvad pinnad, H1 süvis, pargi proportsioonid, H2 astmed ja aia sokkel.
+const { nelinurgad, kattuvused, ala } = await import('./kattuvus.mjs');
+const { H1, H2, PARK } = await import('../kood/seaded.js');
+const nelinurgad_ = nelinurgad(ruhmad);
+const kattuvaidPindu = Object.fromEntries(['H1', 'H2', 'koik'].map((a) => [a, kattuvused(nelinurgad_, ala(a)).length]));
+assert.deepEqual(kattuvaidPindu, { H1: 0, H2: 0, koik: 0 }, 'Leiti kattuvaid samatasapinnalisi pindu (vilkumine).');
+const col = kontekst.col;
+assert.equal(col.overlaps(-22.2, H1.Y0 + 0.5, 0.27).length, 0, 'H1 vasak süvis peab olema avatud.');
+assert.ok(col.overlaps(-22.2, H1.Y0 + 1.2, 0.27).length > 0, 'H1 süvise tagasein peab olema läbimatu.');
+assert.ok(col.overlaps(H1.PASS.X0 - 0.15, H1.Y0 + 0.5, 0.27).length > 0, 'H1 süvise ja läbipääsu vaheline post peab olema läbimatu.');
+assert.equal(col.overlaps((H1.PASS.X0 + H1.PASS.X1) / 2, H1.Y0 + 6, 0.27).length, 0, 'H1 läbipääs peab olema avatud.');
+const pargiLaius = PARK.X1 - PARK.X0, pargiPikkus = PARK.Y1 - PARK.Y0;
+assert.ok(pargiLaius <= 10 && pargiPikkus / pargiLaius >= 1.8, 'Park peab olema piklik (pikkus vähemalt 1,8 × laius).');
+for (const [x, y] of PARK.trees) assert.ok(x > PARK.X0 + 1 && x < PARK.X1 - 1 && y > PARK.Y0 + 1 && y < PARK.Y1 - 1, 'Pargipuu on väljaspool parki.');
+assert.equal(PARK.trees.length, 6, 'Pargis peab olema kuus puud.');
+const sugavused = kontekst.h2.bays.map((b) => b.y);
+assert.ok(Math.max(...sugavused) - Math.min(...sugavused) >= 1.0 && new Set(sugavused).size >= 2, 'H2 fassaad peab astuma sügavusse vähemalt 1 m.');
+assert.ok(kontekst.h2.bays.filter((b) => b.rodud).length >= 2, 'H2 peab säilitama rõdudega fassaadiosad.');
+assert.equal(H2.NF + 1, 7, 'H2 on seitsmekorruseline.');
+assert.equal(H1.NF + 1, 6, 'H1 on kuuekorruseline.');
+const aiaKorgus = Math.max(...col.items.filter((it) => it.tag === 'aed').map((it) => it.h));
+assert.ok(aiaKorgus >= 1.9, 'Aia kokkupõrkekeha peab ulatuma kivisokli ja balustraadi kõrguseni.');
+
 const tulemus = {
   stseen: loenda(stseen), tegelane: loenda(tegelane.root),
   takistusi: kontekst.col.items.length, konnimiseNihe: +nihe.toFixed(3),
+  kattuvaidPindu, pargiMootmed: { laius: +pargiLaius.toFixed(1), pikkus: +pargiPikkus.toFixed(1) },
+  h2Sugavused: sugavused, aiaKorgus: +aiaKorgus.toFixed(2),
   tulemus: 'Läbitud',
   piirang: 'See kontroll ei tõenda visuaalset vastavust ega graafikaprotsessori jõudlust.',
 };

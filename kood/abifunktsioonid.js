@@ -247,6 +247,35 @@ export function vwall(pl, h0, h1, opt = {}) {
   return looGeomeetria(pos, nor, uv, idx);
 }
 
+// Tahutud kiviplokk: püstine prisma plaani nelinurga A→B→C→D kohal, kus A→B on esikülg
+// (väljapool joone paremal) ja D→C tagakülg. Tahud: esikülg, pealmine, kaks otsa ja soovi korral alumine.
+// Esikülje UV on atlase ruut [u0, u1] × [0, 1]; peegeldus vahetab u-suuna, et plokid ei korduks.
+export function kiviplokk(A, B, C, D, h0, h1, u0, u1, opt = {}) {
+  const pos = [], nor = [], uv = [], idx = [];
+  const quad = (c, n, t) => {
+    const b = pos.length / 3;
+    for (let i = 0; i < 4; i++) { pos.push(c[i][0], c[i][1], -c[i][2]); nor.push(...n); uv.push(...t[i]); }
+    idx.push(b, b + 1, b + 2, b, b + 2, b + 3);
+  };
+  const v = (p, h) => [p[0], h, p[1]];
+  const dx = B[0] - A[0], dy = B[1] - A[1], L = Math.hypot(dx, dy) || 1, tx = dx / L, ty = dy / L;
+  const [ua, ub] = opt.peegel ? [u1, u0] : [u0, u1], um = (u0 + u1) / 2, uw = (u1 - u0) * 0.12;
+  quad([v(A, h0), v(B, h0), v(B, h1), v(A, h1)], [ty, 0, tx], [[ua, 0], [ub, 0], [ub, 1], [ua, 1]]);
+  quad([v(A, h1), v(B, h1), v(C, h1), v(D, h1)], [0, 1, 0], [[ua, 0.42], [ub, 0.42], [ub, 0.56], [ua, 0.56]]);
+  quad([v(D, h0), v(A, h0), v(A, h1), v(D, h1)], [-tx, 0, ty], [[um - uw, 0], [um + uw, 0], [um + uw, 1], [um - uw, 1]]);
+  quad([v(B, h0), v(C, h0), v(C, h1), v(B, h1)], [tx, 0, -ty], [[um - uw, 0], [um + uw, 0], [um + uw, 1], [um - uw, 1]]);
+  if (opt.alumine) quad([v(D, h0), v(C, h0), v(B, h0), v(A, h0)], [0, -1, 0], [[ua, 0.42], [ub, 0.42], [ub, 0.56], [ua, 0.56]]);
+  return looGeomeetria(pos, nor, uv, idx);
+}
+
+// Alla suunatud pind: riba tippude järjestus ja normaalid pööratakse ümber (karniisi alapind).
+export function alumine(g) {
+  g.index.array.reverse();
+  const n = g.attributes.normal;
+  for (let i = 0; i < n.count; i++) n.setXYZ(i, -n.getX(i), -n.getY(i), -n.getZ(i));
+  return g;
+}
+
 // Plaanihulknurga täitmine kõrgusel h; UV = X, Y meetrites.
 export function taidaHulknurk(pts, h) {
   const shape = new THREE.Shape(pts.map(p => new THREE.Vector2(p[0], p[1])));

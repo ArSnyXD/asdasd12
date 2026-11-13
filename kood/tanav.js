@@ -4,38 +4,56 @@
 // Kolme käigutee otsad ja kõigi objektide kokkupõrkekehad.
 import * as THREE from 'three';
 import { PLAAN, PARK, H2, h2Plaan } from './seaded.js';
-import { nihutatudJoon, punktKaugusel, kogupikkused, beam, obox, cyl, plaanikast, ahenevToru, rippuvKover, plate, vwall, ribbon, fassaadinelinurk } from './abifunktsioonid.js';
+import { nihutatudJoon, punktKaugusel, kogupikkused, beam, obox, cyl, plaanikast, ahenevToru, rippuvKover, plate, vwall, ribbon, fassaadinelinurk, kiviplokk, alumine, rng } from './abifunktsioonid.js';
 import { on, suundKohas, joonePikkus } from './geomeetria.js';
 
 function looAed(B, ctx) {
-  const fl = ctx.aiaJoon;
-  // Kivisokkel betoonparapetiga; taga kõrgendatud pinnas, tänav jääb joone paremale küljele.
-  B.add('kivimuuriPind', vwall(nihutatudJoon(fl, -0.2), 0, 0.58));
-  B.add('betoon', vwall(nihutatudJoon(fl, -0.24), 0.56, 0.64));
-  B.add('betoon', ribbon(fl, -0.24, 0.3, 0.64));
-  // Balustraad: kaetud postid, ülemine ja alumine rõhttala ning lühikesed balustrid.
+  const fl = ctx.aiaJoon, R = rng(606);
+  // Kivisokkel: kolm rida tahutud ristkülikplokke, nihutatud püstvuugid, iga plokk veidi eri sügavusel
+  // ja eri tooniga; vuukides paistab tume mört. Plokid järgivad joont ka ümardatud nurgas,
+  // sest nende otsad võetakse joone kauguste järgi. Taga kõrgendatud pinnas, tänav jääb joone paremale küljele.
+  const SOK = 0.95, VUUK = 0.015, READ = [[0, 0.3], [0.315, 0.62], [0.635, SOK]];
   const L = kogupikkused(fl), total = L[L.length - 1];
+  B.add('tumeBetoon', vwall(nihutatudJoon(fl, -0.17), 0, SOK));
+  READ.forEach(([h0, h1], c) => {
+    for (let s = c % 2 ? -0.45 : 0; s < total - 0.1; ) {
+      const len = 0.7 + R() * 0.35, s0 = Math.max(0, s) + VUUK / 2, s1 = Math.min(total, s + len) - VUUK / 2;
+      s += len;
+      if (s1 - s0 < 0.2) continue;
+      const q0 = punktKaugusel(fl, s0), q1 = punktKaugusel(fl, s1), o = 0.2 + R() * 0.035;
+      const ees = (q, d) => [q.p[0] - q.n[0] * d, q.p[1] - q.n[1] * d];
+      const k = Math.floor(R() * 4);
+      B.add('sokkelkivi', kiviplokk(ees(q0, o), ees(q1, o), ees(q1, 0.1), ees(q0, 0.1), h0, h1, k / 4 + 0.004, (k + 1) / 4 - 0.004, { peegel: R() < 0.5, alumine: c > 0 }));
+    }
+  });
+  // Betoonkarniis sokli peal koos alapinnaga, taga müüri tagakülg kõrgendatud pinnaseni.
+  B.add('betoon', vwall(nihutatudJoon(fl, -0.27), SOK, SOK + 0.08));
+  B.add('betoon', ribbon(fl, -0.27, 0.3, SOK + 0.08));
+  B.add('betoon', alumine(ribbon(fl, -0.27, -0.1, SOK)));
+  B.add('betoon', vwall(nihutatudJoon(fl, 0.3), 0.55, SOK + 0.08, { flip: true }));
+  // Balustraad karniisil: kaetud postid, ülemine ja alumine rõhttala ning lühikesed balustrid.
+  const b0 = SOK + 0.08;
   const n = Math.round(total / 1.9), posts = [];
   for (let i = 0; i <= n; i++) posts.push(punktKaugusel(fl, (i / n) * total));
   for (const q of posts) {
     const ang = Math.atan2(q.t[1], q.t[0]);
-    B.add('aiakivi', obox(q.p[0], q.p[1], 0.64, 0.21, 0.84, 0.21, ang, true));
-    B.add('aiakivi', obox(q.p[0], q.p[1], 1.48, 0.27, 0.06, 0.27, ang, true));
-    B.add('aiakivi', cyl(q.p[0], q.p[1], 1.54, 0.0, 0.18, 0.11, 4, ang + Math.PI / 4));
+    B.add('aiakivi', obox(q.p[0], q.p[1], b0, 0.21, 0.84, 0.21, ang, true));
+    B.add('aiakivi', obox(q.p[0], q.p[1], b0 + 0.84, 0.27, 0.06, 0.27, ang, true));
+    B.add('aiakivi', cyl(q.p[0], q.p[1], b0 + 0.9, 0.0, 0.18, 0.11, 4, ang + Math.PI / 4));
   }
   for (let i = 0; i < posts.length - 1; i++) {
     const a = posts[i].p, b = posts[i + 1].p;
-    B.add('aiakivi', beam(a, b, 1.25, 1.37, 0.15, { uvMeters: true }));
-    B.add('aiakivi', beam(a, b, 0.64, 0.75, 0.17, { uvMeters: true }));
+    B.add('aiakivi', beam(a, b, b0 + 0.61, b0 + 0.73, 0.15, { uvMeters: true }));
+    B.add('aiakivi', beam(a, b, b0, b0 + 0.11, 0.17, { uvMeters: true }));
     const d = Math.hypot(b[0] - a[0], b[1] - a[1]), m = Math.max(2, Math.round(d / 0.27));
     const ang = Math.atan2(b[1] - a[1], b[0] - a[0]);
     for (let k = 1; k < m; k++) {
       const t = k / m;
-      B.add('aiakivi', obox(a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, 0.75, 0.075, 0.5, 0.075, ang, true));
+      B.add('aiakivi', obox(a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, b0 + 0.11, 0.075, 0.5, 0.075, ang, true));
     }
   }
   // Aia teljel läbimatu sein tegelasele ja kaamerale.
-  ctx.col.polyline(nihutatudJoon(fl, 0.05), 0.25, 1.55, 'aed');
+  ctx.col.polyline(nihutatudJoon(fl, 0.05), 0.25, b0 + 0.95, 'aed');
 }
 
 // Postid.
@@ -183,7 +201,7 @@ function looPark(B, ctx) {
   for (const [X, Y] of PARK.frames) {
     const s = 1.3, h = 3.0, t = 0.08;
     for (const [dx, dy] of [[-s, -s], [s, -s], [s, s], [-s, s]]) {
-      B.add('valge', plaanikast(X + dx - t, X + dx + t, Y + dy - t, Y + dy + t, 0.12, h, { faces: 'NSEW' }));
+      B.add('valge', plaanikast(X + dx - t, X + dx + t, Y + dy - t, Y + dy + t, 0.12, h - 0.2, { faces: 'NSEW' }));   // Postid talade alla.
       ctx.col.circle(X + dx, Y + dy, 0.1, h, 'frame');
     }
     B.add('valge', plaanikast(X - s - t, X + s + t, Y - s - t, Y - s + t, h - 0.2, h, { faces: 'NSEWTB' }));
@@ -201,8 +219,8 @@ function looPark(B, ctx) {
   const L = kogupikkused(inner), total = L[L.length - 1];
   for (let s = 0.6; s < total - 0.4; s += 1.8) {
     const q = punktKaugusel(inner, s);
-    const gapMain = q.p[0] > -10.9 && q.p[0] < -8.1 && q.p[1] < 6.0;              // Sissepääs S–J kõnniteelt.
-    const gapE2 = ((q.p[1] > 8.6 && q.p[1] < 11.2) || (q.p[1] > 17.0 && q.p[1] < 19.6)) && q.p[0] > -1.5;   // Kaks sissepääsu E2-lt.
+    const gapMain = q.p[0] > -12.4 && q.p[0] < -9.6 && q.p[1] < 6.0;              // Sissepääs S–J kõnniteelt.
+    const gapE2 = ((q.p[1] > 8.6 && q.p[1] < 11.2) || (q.p[1] > 17.0 && q.p[1] < 19.6)) && q.p[0] > PARK.X1 - 0.6;   // Kaks sissepääsu idaservast.
     if (gapMain || gapE2) continue;
     B.add('graniit', obox(q.p[0], q.p[1], 0.12, 0.2, 0.55, 0.2, Math.atan2(q.t[1], q.t[0]), true));
     ctx.col.circle(q.p[0], q.p[1], 0.13, 0.67, 'post');
@@ -270,13 +288,13 @@ export function looTanav(B, ctx) {
   looPostid(B, ctx, lights);
   dekoratiivlatern(B, ctx, -29.6, 4.05, lights);
   dekoratiivlatern(B, ctx, -20.2, 4.65, lights);
-  pargivalgusti(B, ctx, -3.4, 5.4, lights);
-  pargivalgusti(B, ctx, -2.4, 21.2, lights);
+  pargivalgusti(B, ctx, -7.5, 8.6, lights);
+  pargivalgusti(B, ctx, -6.9, 21.0, lights);
   // Peatumismärk E2-lt ristmikule lähenejale ning parkimiskeelumärk.
   const sTan = ctx.cornerS - 2.6;
   const sp = on(ctx.aiaJoon, sTan - 0.5, -1.2);
   sign(B, ctx, sp[0], sp[1], 2.35, 0.8, suundKohas(ctx.e2c, 9.0), 'peatumismark');
-  sign(B, ctx, -1.7, 4.95, 2.3, 0.6, Math.atan2(-4.95, 1.7), 'parkimiskeeld');
+  sign(B, ctx, -7.5, 5.7, 2.3, 0.6, Math.atan2(-4.95, 1.7), 'parkimiskeeld');   // Pargi viltu nurga kõnniteel.
   // Postid: kolm aia nurgas, kaks E2 ääres, triibulised H2 juures.
   for (const ds of [-2.4, 0, 2.4]) { const p = on(ctx.aiaJoon, ctx.cornerS + ds, -1.45); tokestuspost(B, ctx, p[0], p[1], false); }
   for (const s of [8.5, 11.0]) { const p = on(ctx.e2c, s, -2.4); tokestuspost(B, ctx, p[0], p[1], false); }

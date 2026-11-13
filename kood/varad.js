@@ -9,7 +9,7 @@ const FAILID = {
   win: 'aknaatlas.png', akenKuma: 'aknaatlase_kuma.png', glass: 'roduklaas.jpg',
   fuajee: 'fuajee.jpg', fuajeeKuma: 'fuajee_kuma.jpg', vore: 'vore.png', bg: 'taustafassaad.jpg', bgE: 'taustafassaadi_kuma.jpg',
   puukoor: 'puukoor.jpg', lehed: 'lehed.png', tihedadLehed: 'tihedad_lehed.jpg', hekk: 'hekk.jpg', muru: 'muru.jpg',
-  muld: 'muld.jpg', kivimuuriPind: 'kivimuur.jpg', aiakivi: 'aiakivi.jpg', post: 'post.jpg',
+  muld: 'muld.jpg', kivimuuriPind: 'kivimuur.jpg', aiakivi: 'aiakivi.jpg', sokkelkivi: 'sokkelkivi.jpg', post: 'post.jpg',
   kaevuluuk: 'kaevuluuk.png', peatumismark: 'peatumismark.png', parkimiskeeld: 'parkimiskeeld.png',
   // Teise etapi tekstuurid.
   vaikePlaat: 'vaike_plaat.jpg', tumePlaat: 'tume_plaat.jpg', nimesilt: 'nimesilt.png', automaadid: 'automaadid.png',
@@ -113,6 +113,7 @@ export function looMaterjalid(T) {
     // Aed.
     kivimuuriPind: S({ map: rep(T.kivimuuriPind, 4, 1) }),
     aiakivi: S({ map: T.aiakivi, roughness: 0.85 }),
+    sokkelkivi: S({ map: T.sokkelkivi, roughness: 0.92 }),   // Sokli plokkide atlas: neli tooni, UV ploki kaupa.
     // Taimestik.
     puukoor: S({ map: rep(T.puukoor, 1, 2), roughness: 0.95 }),
     suurpuuLehed: leheMaterjal(T.lehed, 0xaebba2),

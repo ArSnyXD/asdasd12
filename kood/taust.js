@@ -4,7 +4,7 @@ import { plaanikast, cyl, rng } from './abifunktsioonid.js';
 
 // [X0, X1, Y0, Y1, kõrgus, materjal]
 const BOXES = [
-  [-45.5, -31.8, 6.2, 20.0, 13, 'bg'],
+  [-45.5, -31.9, 6.2, 20.0, 13, 'bg'],      // 10 cm N1 lääneseinast, et aknaraamide pinnad ei kattuks.
   [-60, -46.5, 3.8, 18, 10, 'tumeTaust'],
   [-76, -63, -2, 14, 15, 'bg'],
   [-24.6, -16, 32.3, 44, 22, 'bg'],
