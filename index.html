@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="et">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Shibuya tänavalõik – 3D</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./src/style.css">
+  <script type="importmap">
+    { "imports": { "three": "./vendor/three.module.min.js" } }
+  </script>
+</head>
+<body>
+  <div id="hud">
+    <strong>Shibuya · tänavalõik</strong>
+    <span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / nooled – kõndimine</span>
+    <span><kbd>Shift</kbd> – jooks</span>
+    <span>hiirega lohista – kaamera · rull – suum</span>
+  </div>
+  <div id="loading">Laadin stseeni…</div>
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
