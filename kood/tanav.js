@@ -214,13 +214,14 @@ function looPark(B, ctx) {
     B.add('tumeGraniit', obox(X, Y, 0.12, 1.6, 0.45, 0.5, a, true));
     ctx.col.obox(X, Y, 0.8, 0.25, a, 0.57, 'block');
   }
-  // Kivipostid serva ääres, pargi sissepääsudes vahed.
+  // Kivipostid serva ääres, pargi sissepääsudes vahed: üks peatänava poolt, kaks E2 poolt.
   const inner = nihutatudJoon(ctx.parkCurb, 0.35);
   const L = kogupikkused(inner), total = L[L.length - 1];
+  const vahe = PARK.sissepaasud, nurgaY = ctx.pargiNurk.p[1] + 1.0;
   for (let s = 0.6; s < total - 0.4; s += 1.8) {
     const q = punktKaugusel(inner, s);
-    const gapMain = q.p[0] > -12.4 && q.p[0] < -9.6 && q.p[1] < 6.0;              // Sissepääs S–J kõnniteelt.
-    const gapE2 = ((q.p[1] > 8.6 && q.p[1] < 11.2) || (q.p[1] > 17.0 && q.p[1] < 19.6)) && q.p[0] > PARK.X1 - 0.6;   // Kaks sissepääsu idaservast.
+    const gapMain = q.p[1] < nurgaY && q.p[0] > vahe.tanav[0] && q.p[0] < vahe.tanav[1];
+    const gapE2 = q.p[1] >= nurgaY && vahe.e2.some(([y0, y1]) => q.p[1] > y0 && q.p[1] < y1);
     if (gapMain || gapE2) continue;
     B.add('graniit', obox(q.p[0], q.p[1], 0.12, 0.2, 0.55, 0.2, Math.atan2(q.t[1], q.t[0]), true));
     ctx.col.circle(q.p[0], q.p[1], 0.13, 0.67, 'post');
@@ -288,16 +289,16 @@ export function looTanav(B, ctx) {
   looPostid(B, ctx, lights);
   dekoratiivlatern(B, ctx, -29.6, 4.05, lights);
   dekoratiivlatern(B, ctx, -20.2, 4.65, lights);
-  pargivalgusti(B, ctx, -7.5, 8.6, lights);
-  pargivalgusti(B, ctx, -6.9, 21.0, lights);
-  // Peatumismärk E2-lt ristmikule lähenejale ning parkimiskeelumärk.
+  for (const [X, Y] of PARK.lamps) pargivalgusti(B, ctx, X, Y, lights);
+  // Peatumismärk E2-lt ristmikule lähenejale ning parkimiskeelumärk pargi nurgas äärekivi taga.
   const sTan = ctx.cornerS - 2.6;
   const sp = on(ctx.aiaJoon, sTan - 0.5, -1.2);
   sign(B, ctx, sp[0], sp[1], 2.35, 0.8, suundKohas(ctx.e2c, 9.0), 'peatumismark');
-  sign(B, ctx, -7.5, 5.7, 2.3, 0.6, Math.atan2(-4.95, 1.7), 'parkimiskeeld');   // Pargi viltu nurga kõnniteel.
-  // Postid: kolm aia nurgas, kaks E2 ääres, triibulised H2 juures.
+  const pn = ctx.pargiNurk, pm = [pn.p[0] - pn.valja[0] * 0.5, pn.p[1] - pn.valja[1] * 0.5];
+  sign(B, ctx, pm[0], pm[1], 2.3, 0.6, Math.atan2(pn.valja[1], pn.valja[0]), 'parkimiskeeld');
+  // Postid: kolm aia nurgas, kaks E2 ääres aiapoolsel kõnniteel, triibulised H2 juures.
   for (const ds of [-2.4, 0, 2.4]) { const p = on(ctx.aiaJoon, ctx.cornerS + ds, -1.45); tokestuspost(B, ctx, p[0], p[1], false); }
-  for (const s of [8.5, 11.0]) { const p = on(ctx.e2c, s, -2.4); tokestuspost(B, ctx, p[0], p[1], false); }
+  for (const s of [10.5, 13.0]) { const p = on(ctx.e2c, s, -2.4); tokestuspost(B, ctx, p[0], p[1], false); }
   // Triibulised postid H2 sissesõidu suudmes, H2 kohalikes koordinaatides.
   for (const x of [ctx.h2.drive[0] - 0.45, ctx.h2.drive[1] + 0.45]) { const p = h2Plaan(x, ctx.h2.edgeY(x) - 0.45); tokestuspost(B, ctx, p[0], p[1], true); }
   looPark(B, ctx);

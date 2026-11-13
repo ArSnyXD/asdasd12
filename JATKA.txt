@@ -1,7 +1,7 @@
 Jätka selles repositooriumis olevat mängu. Loe AGENTS.md, README.md, SEIS.md, ULESANDED.md ja viited/README.md.
 
-Versioonis 0.6.0 on ULESANDED.md kuus parandusrühma (H1 pindade vilkumine, vasak madal süvis, rõdude alapinnad, pargi proportsioonid, H2 astmeline fassaad, aia kivisokkel) tehtud ja kontrollitud; tulemused ja piirangud on failis SEIS.md. Kasuta praegust stseeni alusena; ära loo projekti uuesti ega taasesita vanu parandusi.
+ULESANDED.md rühmad 1–6 (H1 pindade vilkumine, vasak madal süvis, rõdude alapinnad, pargi proportsioonid, H2 astmeline fassaad, aia kivisokkel) tehti versioonis 0.6.0 ning rühmad 7–9 (tee ja ristmik pargi juures, H2 akna ees olnud seinajupp, jaapanikeelsed kirjad mängumaailmas) versioonis 0.7.0; tulemused ja piirangud on failis SEIS.md. Kasuta praegust stseeni alusena; ära loo projekti uuesti ega taasesita vanu parandusi.
 
-Säilita tegelane, juhtimine, udu, hämar retroilme, käigutee ja varasemad toimivad parandused. Kõik uus tekst, kommentaarid ja vastused peavad olema eesti keeles. Väliste teekide API ja litsentsid jäävad algsel kujul.
+Säilita tegelane, juhtimine, udu, hämar retroilme, käigutee ja varasemad toimivad parandused. Kõik uus tekst, kommentaarid ja vastused peavad olema eesti keeles; mängumaailmas füüsiliselt nähtavad kirjad on jaapani keeles. Väliste teekide API ja litsentsid jäävad algsel kujul.
 
 Käivita mäng repositooriumi juurest käsuga npm start, kontroll käsuga npm test (sisaldab kattuvate pindade kontrolli). Playwrighti olemasolul kasuta ka tooriistad/brauserikontroll.mjs ja tooriistad/vaatekontroll.mjs. Uuenda SEIS.md tegelike tulemuste ja piirangutega ning esita lühike eestikeelne aruanne repositooriumi tavapärases töövoos.

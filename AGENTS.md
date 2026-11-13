@@ -2,9 +2,10 @@
 
 Loe esmalt README.md, SEIS.md, ULESANDED.md ja viited/README.md. See repositoorium sisaldab töötavat eestikeelset alusversiooni. Jätka sellest, ära alusta stseeni uuesti.
 
-- ULESANDED.md kuus parandusrühma on versioonis 0.6.0 tehtud ja kontrollitud; tulemused ja piirangud on failis SEIS.md. Uus töö lähtub sellest seisust.
+- ULESANDED.md rühmad 1–6 tehti ja kontrolliti versioonis 0.6.0, rühmad 7–9 (tee ja ristmik pargi juures, H2 aken, jaapanikeelsed kirjad) versioonis 0.7.0. Tulemused ja piirangud on failis SEIS.md. Uus töö lähtub sellest seisust.
 - Kirjuta kogu uus dokumentatsioon, kommentaarid, kasutajaliides ja vastused eesti keeles. Ära lisa failinimedesse keelemärgiseid. Hoia väliste liideste ja programmeerimiskeelte tehniline süntaks puutumatuna.
-- Säilita udu, hämar retroilme, juhtimine, tegelane, kuus pargipuud, H1 kuus ja H2 seitse korrust ning käigutee S → J → E1/E2.
+- Mängumaailmas füüsiliselt nähtavad kirjad (märgid, teekiri, plakatid, sildid, automaadid) on jaapani keeles; menüüd, juhtimisjuhised, HUD ja pealtvaate tähised jäävad eesti keelde. Kirjad joonistatakse tekstuurigeneraatorites kohaliku jaapani fondiga (`tooriistad/kirjad.py`); mäng ei laadi fonte.
+- Säilita udu, hämar retroilme, juhtimine, tegelane, kuus pargipuud, H1 kuus ja H2 seitse korrust ning käigutee S → J → E1/E2. E2 kulgeb pargi ja kivipiirde vahel ning park on selle ääres kiil.
 - Säilita varasemad toimivad parandused, eriti tegelase riiete katvus ja automaatide suletud ülaosa.
 - Three.js ja tekstuurid peavad jääma kohalikuks; mäng ei tohi hakata sõltuma välisest sisuvõrgust. Ära muuda kolmanda osapoole litsentsi.
 - Repositooriumi juures asub index.html. Käivita npm start ja kontrolli npm test abil (sisaldab kattuvate samatasapinnaliste pindade kontrolli). Paigaldusetappi ei ole. Playwrighti olemasolul anna visuaalseks kontrolliks tooriistad/brauserikontroll.mjs ja tooriistad/vaatekontroll.mjs.
